@@ -1,2 +1,2 @@
-# carbonated-data
+# Carbonated Data
 Data access library.
