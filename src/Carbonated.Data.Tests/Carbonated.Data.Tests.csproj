@@ -56,6 +56,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyMapperShould.cs" />
     <Compile Include="RecordShould.cs" />
+    <Compile Include="SharedMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

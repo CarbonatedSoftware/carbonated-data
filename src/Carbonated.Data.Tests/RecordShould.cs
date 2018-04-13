@@ -1,17 +1,11 @@
 ﻿using NUnit.Framework;
+using static Carbonated.Data.Tests.SharedMethods;
 
 namespace Carbonated.Data.Tests
 {
     [TestFixture]
     public class RecordShould
     {
-        Record Record(params (string field, object value)[] fields)
-        {
-            var record = new MockDataRecord(fields);
-            var reader = new MockDataReader(record);
-            return new Data.Record(reader);
-        }
-
         [Test]
         public void KnowWhichFieldsItContains()
         {
