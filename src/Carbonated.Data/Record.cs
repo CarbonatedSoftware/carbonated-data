@@ -60,6 +60,7 @@ namespace Carbonated.Data
 
         public static string GetNormalizedName(string name) => DisallowedChars.Replace(name, "").ToLowerInvariant();
 
+
         public object this[string name] => dataReader[name];
 
         public object this[int i] => dataReader[i];

@@ -50,9 +50,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entity.cs" />
     <Compile Include="MockDataReader.cs" />
     <Compile Include="MockDataRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyMapperShould.cs" />
     <Compile Include="RecordShould.cs" />
   </ItemGroup>
   <ItemGroup>
