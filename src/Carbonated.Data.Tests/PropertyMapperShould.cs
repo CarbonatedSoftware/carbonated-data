@@ -86,6 +86,28 @@ namespace Carbonated.Data.Tests
             Assert.AreEqual(PopulationCondition.Required, mapper.Mappings.Single(m => m.Property.Name == "Name").Condition);
         }
 
+        [Test]
+        public void SetCustomValueConverterWhenSpecified()
+        {
+            Func<object, object> customConverter = value => int.Parse(value.ToString());
+
+            var mapper = new PropertyMapper<Entity>()
+                .Map(x => x.Id, "id", customConverter);
+
+            Assert.AreSame(customConverter, mapper.Mappings.Single(m => m.Property.Name == "Id").ValueConverter);
+        }
+
+        [Test]
+        public void SetAfterBindingActionForEntityWhenSpecified()
+        {
+            Action<Record, Entity> action = (record, entity) => entity.Name = "name";
+
+            var mapper = new PropertyMapper<Entity>()
+                .AfterBinding(action);
+
+            Assert.AreSame(action, mapper.AfterBindAction);
+        }
+
         private string[] Strings(params string[] strings) => strings;
     }
 }

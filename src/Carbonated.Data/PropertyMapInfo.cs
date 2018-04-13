@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Carbonated.Data
 {
@@ -24,6 +25,12 @@ namespace Carbonated.Data
         /// Condition that must be fulfilled when populating a property.
         /// </summary>
         public PopulationCondition Condition { get; set; } = PopulationCondition.Optional;
+
+        /// <summary>
+        /// When set, value converter that will be used in place of standard behavior when
+        /// populating entities.
+        /// </summary>
+        public Func<object, object> ValueConverter { get; set; }
 
         /// <summary>
         /// When set, indicates that the field should be ignored during data binding.

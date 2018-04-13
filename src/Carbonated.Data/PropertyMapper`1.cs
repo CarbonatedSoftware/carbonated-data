@@ -29,17 +29,31 @@ namespace Carbonated.Data
 
         internal IEnumerable<PropertyMapInfo> Mappings => mappings;
 
-        public PropertyMapper<TEntity> Map<P>(Expression<Func<TEntity, P>> property, string field) 
-            => MapProp(property, field, defaultCondition);
+        internal Action<Record, TEntity> AfterBindAction { get; private set; }
+
+        public PropertyMapper<TEntity> Map<P>(Expression<Func<TEntity, P>> property, string field)
+            => MapProp(property, field, defaultCondition, null);
+
+        public PropertyMapper<TEntity> Map<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+            => MapProp(property, field, defaultCondition, valueConverter);
 
         public PropertyMapper<TEntity> MapOptional<P>(Expression<Func<TEntity, P>> property, string field) 
-            => MapProp(property, field, PopulationCondition.Optional);
+            => MapProp(property, field, PopulationCondition.Optional, null);
+
+        public PropertyMapper<TEntity> MapOptional<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+            => MapProp(property, field, PopulationCondition.Optional, valueConverter);
 
         public PropertyMapper<TEntity> MapRequired<P>(Expression<Func<TEntity, P>> property, string field) 
-            => MapProp(property, field, PopulationCondition.Required);
+            => MapProp(property, field, PopulationCondition.Required, null);
+
+        public PropertyMapper<TEntity> MapRequired<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+            => MapProp(property, field, PopulationCondition.Required, valueConverter);
 
         public PropertyMapper<TEntity> MapNotNull<P>(Expression<Func<TEntity, P>> property, string field) 
-            => MapProp(property, field, PopulationCondition.NotNull);
+            => MapProp(property, field, PopulationCondition.NotNull, null);
+
+        public PropertyMapper<TEntity> MapNotNull<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+            => MapProp(property, field, PopulationCondition.NotNull, valueConverter);
 
         public PropertyMapper<TEntity> Optional<P>(Expression<Func<TEntity, P>> property) 
             => SetCondition(property, PopulationCondition.Optional);
@@ -65,7 +79,13 @@ namespace Carbonated.Data
             return this;
         }
 
-        private PropertyMapper<TEntity> MapProp<P>(Expression<Func<TEntity, P>> property, string field, PopulationCondition condition)
+        public PropertyMapper<TEntity> AfterBinding(Action<Record, TEntity> action)
+        {
+            AfterBindAction = action;
+            return this;
+        }
+
+        private PropertyMapper<TEntity> MapProp<P>(Expression<Func<TEntity, P>> property, string field, PopulationCondition condition, Func<object, object> valueConverter)
         {
             var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
             if (PropertyIsMappedToDifferentField(field, prop))
@@ -73,8 +93,9 @@ namespace Carbonated.Data
                 throw new Exception($"Field cannot be mapped to more than one property: {field}");
             }
 
+            //TODO: Consider updating rather than removing and re-adding.
             RemoveGeneratedMapping(prop);
-            mappings.Add(new PropertyMapInfo(field, prop) { Condition = condition });
+            mappings.Add(new PropertyMapInfo(field, prop) { Condition = condition, ValueConverter = valueConverter });
 
             return this;
         }
