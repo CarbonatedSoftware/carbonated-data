@@ -129,7 +129,7 @@ namespace Carbonated.Data
         internal TEntity CreateInstance(Record record)
         {
             var instance = Activator.CreateInstance<TEntity>();
-            foreach (var mapping in Mappings)
+            foreach (var mapping in Mappings.Where(m => !m.IsIgnored))
             {
                 var value = record.GetValue(mapping.Field);
                 var prop = mapping.Property;
@@ -143,6 +143,8 @@ namespace Carbonated.Data
                     prop.SetValue(instance, value);
                 }
             }
+            AfterBindAction?.Invoke(record, instance);
+
             return instance;
         }
     }

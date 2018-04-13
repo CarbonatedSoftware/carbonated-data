@@ -147,9 +147,29 @@ namespace Carbonated.Data.Tests
             Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
         }
 
-        // call after bind action when set
+        [Test]
+        public void CallAfterBindActionWhenSet()
+        {
+            var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
 
-        // ignore data when property is marked ignored
+            var mapper = new PropertyMapper<Entity>()
+                .AfterBinding((r, e) => e.Title = "override");
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(new Entity(10, "John Q", "override"), inst);
+        }
+
+        [Test]
+        public void NotLoadFromRecordWhenPropertyIsMarkedIgnore()
+        {
+            var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
+
+            var mapper = new PropertyMapper<Entity>()
+                .Ignore(x => x.Title);
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(new Entity(10, "John Q", null), inst);
+        }
 
         // populate when record has non-normal name
 
