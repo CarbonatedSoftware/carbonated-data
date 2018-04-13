@@ -32,7 +32,7 @@ namespace Carbonated.Data.Tests
         {
             var mapper = new PropertyMapper<Entity>();
 
-            var ex = Assert.Throws<Exception>(() => mapper.Map(x => x.Name, "Title"));
+            var ex = Assert.Throws<MappingException>(() => mapper.Map(x => x.Name, "Title"));
             StringAssert.StartsWith("Field cannot be mapped to more than one property", ex.Message);
         }
 
@@ -217,9 +217,31 @@ namespace Carbonated.Data.Tests
             Assert.IsNull(inst.DateProp);
         }
 
-        // convert enums
+        [Test]
+        public void ConvertEnums()
+        {
+            var record = Record(("color", "Blue"), ("shape", 2), ("othercolor", DBNull.Value), ("othershape", ""));
 
-        // throw when undefined non-numeric passed for an enum
+            var mapper = new PropertyMapper<Enums>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(Enums.Colors.Blue, inst.Color);
+            Assert.AreEqual(Enums.Shapes.Square, inst.Shape);
+            Assert.AreEqual(Enums.Colors.Red, inst.OtherColor);
+            Assert.AreEqual(Enums.Shapes.Circle, inst.OtherShape);
+        }
+
+        [Test]
+        public void ThrowWhenRecordHasUndefinedEnumValue()
+        {
+            var record1 = Record(("color", "Yellow"));
+            var record2 = Record(("shape", 5));
+
+            var mapper = new PropertyMapper<Enums>();
+
+            Assert.Throws<BindingException>(() => mapper.CreateInstance(record1));
+            Assert.Throws<BindingException>(() => mapper.CreateInstance(record2));
+        }
 
         // convert guids
 
@@ -243,6 +265,15 @@ namespace Carbonated.Data.Tests
 
         // throw when not null property is null
 
+        #endregion
+
+        #region Test types
+
+        class NonNormalEntity
+        {
+            public int Entity_Id { get; set; }
+        }
+
         class IntDate
         {
             public int IntProp { get; set; }
@@ -254,6 +285,18 @@ namespace Carbonated.Data.Tests
             public int? IntProp { get; set; }
             public DateTime? DateProp { get; set; }
         }
+
+        class Enums
+        {
+            public enum Colors { Red, Blue, Green }
+            public enum Shapes { Circle, Triangle, Square }
+
+            public Colors Color { get; set; }
+            public Shapes Shape { get; set; }
+            public Colors OtherColor { get; set; }
+            public Shapes OtherShape { get; set; }
+        }
+
         #endregion
     }
 }

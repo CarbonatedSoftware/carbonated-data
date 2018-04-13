@@ -90,7 +90,7 @@ namespace Carbonated.Data
             var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
             if (PropertyIsMappedToDifferentField(field, prop))
             {
-                throw new Exception($"Field cannot be mapped to more than one property: {field}");
+                throw new MappingException($"Field cannot be mapped to more than one property: {field}");
             }
 
             //TODO: Consider updating rather than removing and re-adding.
@@ -144,6 +144,10 @@ namespace Carbonated.Data
                     {
                         prop.SetValue(instance, null);
                     }
+                    else if (prop.PropertyType.IsEnum)
+                    {
+                        prop.SetValue(instance, ConvertEnum(value, prop.PropertyType));
+                    }
                     else
                     {
                         prop.SetValue(instance, value);
@@ -153,6 +157,19 @@ namespace Carbonated.Data
             AfterBindAction?.Invoke(record, instance);
 
             return instance;
+        }
+
+        private object ConvertEnum(object value, Type propertyType)
+        {
+            if (Enum.IsDefined(propertyType, value))
+            {
+                return Enum.Parse(propertyType, value.ToString(), true);
+            }
+            else if (value is string str && str == string.Empty)
+            {
+                return null;
+            }
+            throw new BindingException($"Value could not be parsed as {propertyType.Name}: {value}");
         }
     }
 }

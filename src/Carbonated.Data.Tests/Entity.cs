@@ -33,9 +33,4 @@
             }
         }
     }
-
-    class NonNormalEntity
-    {
-        public int Entity_Id { get; set; }
-    }
 }
