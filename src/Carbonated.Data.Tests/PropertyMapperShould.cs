@@ -138,10 +138,10 @@ namespace Carbonated.Data.Tests
         [Test]
         public void PopulateFromCustomMappingWithValueConverter()
         {
-            var record = Record(("id", "10"), ("name", "John Q"), ("title", "Tester"));
+            var record = Record(("id", "ten"), ("name", "John Q"), ("title", "Tester"));
 
             var mapper = new PropertyMapper<Entity>()
-                .Map(x => x.Id, "id", v => int.Parse(v.ToString()));
+                .Map(x => x.Id, "id", v => v.ToString() == "ten" ? 10 : 0);
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
@@ -171,13 +171,51 @@ namespace Carbonated.Data.Tests
             Assert.AreEqual(new Entity(10, "John Q", null), inst);
         }
 
-        // populate when record has non-normal name
+        [Test]
+        public void PopulateWhenRecordHasNonNormalName()
+        {
+            var record = Record(("id", 10), ("name", "John Q"), ("ti_tle", "Tester"));
 
-        // populate when property has non-normal name
+            var mapper = new PropertyMapper<Entity>();
+            var inst = mapper.CreateInstance(record);
 
-        // convert nulls to default for value types
+            Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        }
 
-        // set nulls on nullable value types
+        [Test]
+        public void PopulateWhenPropertyHasNonNormalName()
+        {
+            var record = Record(("EntityId", 50));
+
+            var mapper = new PropertyMapper<NonNormalEntity>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(50, inst.Entity_Id);
+        }
+
+        [Test]
+        public void ConvertNullsToDefaultForValueTypes()
+        {
+            var record = Record(("intprop", null), ("dateprop", DBNull.Value));
+
+            var mapper = new PropertyMapper<IntDate>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(0, inst.IntProp);
+            Assert.AreEqual(DateTime.MinValue, inst.DateProp);
+        }
+
+        [Test]
+        public void SetNullForNullableValueTypes()
+        {
+            var record = Record(("intprop", null), ("dateprop", DBNull.Value));
+
+            var mapper = new PropertyMapper<NullableIntDate>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.IsNull(inst.IntProp);
+            Assert.IsNull(inst.DateProp);
+        }
 
         // convert enums
 
@@ -205,7 +243,17 @@ namespace Carbonated.Data.Tests
 
         // throw when not null property is null
 
+        class IntDate
+        {
+            public int IntProp { get; set; }
+            public DateTime DateProp { get; set; }
+        }
 
+        class NullableIntDate
+        {
+            public int? IntProp { get; set; }
+            public DateTime? DateProp { get; set; }
+        }
         #endregion
     }
 }

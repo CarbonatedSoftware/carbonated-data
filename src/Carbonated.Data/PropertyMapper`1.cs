@@ -140,7 +140,14 @@ namespace Carbonated.Data
                 }
                 else
                 {
-                    prop.SetValue(instance, value);
+                    if (value == null || value is DBNull)
+                    {
+                        prop.SetValue(instance, null);
+                    }
+                    else
+                    {
+                        prop.SetValue(instance, value);
+                    }
                 }
             }
             AfterBindAction?.Invoke(record, instance);
