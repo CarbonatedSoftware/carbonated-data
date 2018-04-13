@@ -122,9 +122,30 @@ namespace Carbonated.Data.Tests
             Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
         }
 
-        // populate from custom mapping
+        [Test]
+        public void PopulateFromCustomMapping()
+        {
+            var record = Record(("id", 10), ("nom", "John Q"), ("role", "Tester"));
 
-        // populate with custom value converter
+            var mapper = new PropertyMapper<Entity>()
+                .Map(x => x.Name, "nom")
+                .Map(x => x.Title, "role");
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        }
+
+        [Test]
+        public void PopulateFromCustomMappingWithValueConverter()
+        {
+            var record = Record(("id", "10"), ("name", "John Q"), ("title", "Tester"));
+
+            var mapper = new PropertyMapper<Entity>()
+                .Map(x => x.Id, "id", v => int.Parse(v.ToString()));
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        }
 
         // call after bind action when set
 

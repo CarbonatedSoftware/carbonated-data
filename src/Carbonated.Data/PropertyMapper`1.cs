@@ -134,7 +134,14 @@ namespace Carbonated.Data
                 var value = record.GetValue(mapping.Field);
                 var prop = mapping.Property;
 
-                prop.SetValue(instance, value);
+                if (mapping.ValueConverter != null)
+                {
+                    prop.SetValue(instance, mapping.ValueConverter(value));
+                }
+                else
+                {
+                    prop.SetValue(instance, value);
+                }
             }
             return instance;
         }
