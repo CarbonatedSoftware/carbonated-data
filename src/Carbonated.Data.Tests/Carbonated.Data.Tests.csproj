@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity.cs" />
+    <Compile Include="EntityReaderShould.cs" />
     <Compile Include="MockDataReader.cs" />
     <Compile Include="MockDataRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

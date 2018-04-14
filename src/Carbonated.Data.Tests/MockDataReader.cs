@@ -21,6 +21,10 @@ namespace Carbonated.Data.Tests
 
         public IDataRecord CurrentRecord { get; private set; }
 
+        public bool IsClosed { get; private set; } = false;
+
+        public void Close() => IsClosed = true;
+
         public bool Read()
         {
             if (++recordIndex < records.Count)
@@ -65,9 +69,7 @@ namespace Carbonated.Data.Tests
 
         #region IDataReader members that we don't care about for testing
         public int Depth { get { throw new NotImplementedException(); } }
-        public bool IsClosed { get { throw new NotImplementedException(); } }
         public int RecordsAffected { get { throw new NotImplementedException(); } }
-        public void Close() { throw new NotImplementedException(); }
         public DataTable GetSchemaTable() { throw new NotImplementedException(); }
         public bool NextResult() { throw new NotImplementedException(); }
         public void Dispose() { throw new NotImplementedException(); }

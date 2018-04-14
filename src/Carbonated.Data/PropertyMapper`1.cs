@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Carbonated.Data
 {
-    public class PropertyMapper<TEntity>
+    public class PropertyMapper<TEntity> : Mapper<TEntity>
     {
         private readonly IList<PropertyMapInfo> mappings;
         private readonly PopulationCondition defaultCondition;
@@ -126,7 +126,7 @@ namespace Carbonated.Data
             }
         }
 
-        internal TEntity CreateInstance(Record record)
+        public TEntity CreateInstance(Record record)
         {
             var instance = Activator.CreateInstance<TEntity>();
             foreach (var mapping in Mappings.Where(m => !m.IsIgnored))
