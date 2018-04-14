@@ -131,8 +131,18 @@ namespace Carbonated.Data
             var instance = Activator.CreateInstance<TEntity>();
             foreach (var mapping in Mappings.Where(m => !m.IsIgnored))
             {
+                if (mapping.Condition == PopulationCondition.Required && !record.HasField(mapping.Field))
+                {
+                    throw new BindingException($"A required field was not found in the data record: {mapping.Field}");
+                }
+
                 var value = record.GetValue(mapping.Field);
                 var prop = mapping.Property;
+
+                if (mapping.Condition == PopulationCondition.NotNull && (value == null || value is DBNull))
+                {
+                    throw new BindingException($"The value of {mapping.Field} may not be null.");
+                }
 
                 if (mapping.ValueConverter != null)
                 {
@@ -141,7 +151,8 @@ namespace Carbonated.Data
                 else
                 {
                     Type propertyType = prop.PropertyType;
-                    if (IsNullable(propertyType))
+                    bool isNullable = IsNullable(propertyType);
+                    if (isNullable)
                     {
                         // If we have a nullable type, extract it so that our type comparisons below work.
                         propertyType = Nullable.GetUnderlyingType(propertyType);
@@ -166,6 +177,10 @@ namespace Carbonated.Data
                         // the value to null so that default will be set.
                         prop.SetValue(instance, null);
                     }
+                    else if (!isNullable && IsComplex(propertyType) && IsPossiblyJson(value))
+                    {
+                        prop.SetValue(instance, DeserializeJson(value, prop.PropertyType));
+                    }
                     else
                     {
                         prop.SetValue(instance, Convert.ChangeType(value, propertyType));
@@ -179,6 +194,15 @@ namespace Carbonated.Data
 
         private bool IsNullable(Type type) 
             => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+
+        private bool IsComplex(Type type)
+        {
+            return !(type.IsPrimitive 
+                || type == typeof(DateTime) 
+                || type == typeof(decimal) 
+                || type == typeof(Guid) 
+                || type == typeof(string));
+        }
 
         private object ConvertEnum(object value, Type propertyType)
         {
@@ -208,5 +232,20 @@ namespace Carbonated.Data
 
             throw new BindingException($"Value could not be parsed as {typeof(Guid).Name}: {value}");
         }
+
+        private bool IsPossiblyJson(object value)
+        {
+            if (!(value is string))
+            {
+                return false;
+            }
+            string str = value.ToString().Trim();
+            return string.IsNullOrWhiteSpace(str)
+                || (str.StartsWith("{") && str.EndsWith("}"))
+                || (str.StartsWith("[") && str.EndsWith("]"));
+        }
+
+        private object DeserializeJson(object value, Type propertyType) 
+            => Newtonsoft.Json.JsonConvert.DeserializeObject(value.ToString(), propertyType);
     }
 }

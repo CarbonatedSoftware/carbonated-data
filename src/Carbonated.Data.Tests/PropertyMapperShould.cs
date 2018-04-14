@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using static Carbonated.Data.Tests.SharedMethods;
@@ -198,7 +199,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("intprop", null), ("dateprop", DBNull.Value));
 
-            var mapper = new PropertyMapper<IntDate>();
+            var mapper = new PropertyMapper<IntDateEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(0, inst.IntProp);
@@ -210,7 +211,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("intprop", null), ("dateprop", DBNull.Value));
 
-            var mapper = new PropertyMapper<NullableIntDate>();
+            var mapper = new PropertyMapper<NullableIntDateEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.IsNull(inst.IntProp);
@@ -222,13 +223,13 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("color", "Blue"), ("shape", 2), ("othercolor", DBNull.Value), ("othershape", ""));
 
-            var mapper = new PropertyMapper<Enums>();
+            var mapper = new PropertyMapper<EnumEntity>();
             var inst = mapper.CreateInstance(record);
 
-            Assert.AreEqual(Enums.Colors.Blue, inst.Color);
-            Assert.AreEqual(Enums.Shapes.Square, inst.Shape);
-            Assert.AreEqual(Enums.Colors.Red, inst.OtherColor);
-            Assert.AreEqual(Enums.Shapes.Circle, inst.OtherShape);
+            Assert.AreEqual(EnumEntity.Colors.Blue, inst.Color);
+            Assert.AreEqual(EnumEntity.Shapes.Square, inst.Shape);
+            Assert.AreEqual(EnumEntity.Colors.Red, inst.OtherColor);
+            Assert.AreEqual(EnumEntity.Shapes.Circle, inst.OtherShape);
         }
 
         [Test]
@@ -237,7 +238,7 @@ namespace Carbonated.Data.Tests
             var record1 = Record(("color", "Yellow"));
             var record2 = Record(("shape", 5));
 
-            var mapper = new PropertyMapper<Enums>();
+            var mapper = new PropertyMapper<EnumEntity>();
 
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record1));
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record2));
@@ -303,17 +304,61 @@ namespace Carbonated.Data.Tests
             Assert.AreEqual(3.14m, inst.DecimalProp);
         }
 
-        // deserialize json for complex properties when field is string
+        [Test]
+        public void DeserializeJsonWhenPropertyIsComplexAndFieldIsJsonString()
+        {
+            var record = Record(("IntDateProp", "{ \"IntProp\" : 5, \"DateProp\" : \"2016-01-01 16:15:00 \" }"));
 
-        // deserialize json for complex properties for arrays
+            var mapper = new PropertyMapper<JsonEntity>();
+            var inst = mapper.CreateInstance(record);
 
-        // deserialize json for complex properties for arrays when empty
+            Assert.AreEqual(inst.IntDateProp.IntProp, 5);
+            Assert.AreEqual(inst.IntDateProp.DateProp, new DateTime(2016, 1, 1, 16, 15, 0));
+        }
 
-        // deserialize json for complex properties for arrays when value is null
+        [Test]
+        public void DeserializeJsonWhenPropertyIsArrayAndFieldIsJsonArray()
+        {
+            var record1 = Record(("numbers", "[1, 2, 3, 4]"), ("strings", "[\"foo\", \"bar\"]"));
+            var record2 = Record(("numbers", "[]"), ("strings", "[]"));
+            var record3 = Record(("numbers", null), ("strings", ""));
 
-        // throw when required property has missing field
+            var mapper = new PropertyMapper<JsonArrayEntity>();
+            var inst1 = mapper.CreateInstance(record1);
+            var inst2 = mapper.CreateInstance(record2);
+            var inst3 = mapper.CreateInstance(record3);
 
-        // throw when not null property is null
+            CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, inst1.Numbers);
+            CollectionAssert.AreEqual(Strings("foo", "bar"), inst1.Strings);
+
+            Assert.AreEqual(0, inst2.Numbers.Length);
+            Assert.AreEqual(0, inst2.Strings.Count());
+
+            Assert.IsNull(inst3.Numbers);
+            Assert.IsNull(inst3.Strings);
+        }
+
+        [Test]
+        public void ThrowWhenRecordIsMissingRequiredField()
+        {
+            var record = Record(("Id", 10), ("Title", "Tester"));
+
+            var mapper = new PropertyMapper<Entity>()
+                .Required(x => x.Name);
+
+            Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
+        }
+
+        [Test]
+        public void ThrowWhenRecordHasNullInNotNullField()
+        {
+            var record = Record(("id", 10), ("name", null), ("title", "Tester"));
+
+            var mapper = new PropertyMapper<Entity>()
+                .NotNull(x => x.Name);
+
+            Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
+        }
 
         #endregion
 
@@ -324,19 +369,19 @@ namespace Carbonated.Data.Tests
             public int Entity_Id { get; set; }
         }
 
-        class IntDate
+        class IntDateEntity
         {
             public int IntProp { get; set; }
             public DateTime DateProp { get; set; }
         }
 
-        class NullableIntDate
+        class NullableIntDateEntity
         {
             public int? IntProp { get; set; }
             public DateTime? DateProp { get; set; }
         }
 
-        class Enums
+        class EnumEntity
         {
             public enum Colors { Red, Blue, Green }
             public enum Shapes { Circle, Triangle, Square }
@@ -371,6 +416,17 @@ namespace Carbonated.Data.Tests
             public int IntProp { get; set; }
             public DateTime DateProp { get; set; }
             public decimal DecimalProp { get; set; }
+        }
+
+        class JsonEntity
+        {
+            public IntDateEntity IntDateProp { get; set; }
+        }
+
+        class JsonArrayEntity
+        {
+            public int[] Numbers { get; set; }
+            public IEnumerable<string> Strings { get; set; }
         }
 
         #endregion
