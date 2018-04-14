@@ -159,9 +159,16 @@ namespace Carbonated.Data
                     {
                         prop.SetValue(instance, ConvertGuid(value));
                     }
+                    else if (propertyType == typeof(char) && value.ToString() == string.Empty)
+                    {
+                        // Empty char columns are possible in a database, but converting them
+                        // to the char type will fail, so we need to check for them and set
+                        // the value to null so that default will be set.
+                        prop.SetValue(instance, null);
+                    }
                     else
                     {
-                        prop.SetValue(instance, value);
+                        prop.SetValue(instance, Convert.ChangeType(value, propertyType));
                     }
                 }
             }
@@ -179,7 +186,7 @@ namespace Carbonated.Data
             {
                 return Enum.Parse(propertyType, value.ToString(), true);
             }
-            else if (value is string str && str == string.Empty)
+            if (value is string str && str == string.Empty)
             {
                 return null;
             }

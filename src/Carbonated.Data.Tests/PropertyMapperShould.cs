@@ -279,9 +279,29 @@ namespace Carbonated.Data.Tests
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
         }
 
-        // convert empty char columns as char default
+        [Test]
+        public void ConvertEmptyCharColumnsIntoDefaultForCharType()
+        {
+            var record = Record(("CharProp", string.Empty));
 
-        // convert value types stored as strings
+            var mapper = new PropertyMapper<CharEntity>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(default(char), inst.CharProp);
+        }
+
+        [Test]
+        public void ConvertValueTypesStoredAsStringsInTheRecord()
+        {
+            var record = Record(("intprop", "42"), ("dateprop", "2018-04-02 08:30:01"), ("decimalprop", "3.14"));
+
+            var mapper = new PropertyMapper<ValueEntity>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.AreEqual(42, inst.IntProp);
+            Assert.AreEqual(new DateTime(2018, 4, 2, 8, 30, 1), inst.DateProp);
+            Assert.AreEqual(3.14m, inst.DecimalProp);
+        }
 
         // deserialize json for complex properties when field is string
 
@@ -339,6 +359,18 @@ namespace Carbonated.Data.Tests
             public Guid? Foo { get; set; }
             public Guid? Bar { get; set; }
             public Guid? Baz { get; set; }
+        }
+
+        class CharEntity
+        {
+            public char CharProp { get; set; }
+        }
+
+        class ValueEntity
+        {
+            public int IntProp { get; set; }
+            public DateTime DateProp { get; set; }
+            public decimal DecimalProp { get; set; }
         }
 
         #endregion
