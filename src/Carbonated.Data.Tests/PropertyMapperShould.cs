@@ -243,11 +243,41 @@ namespace Carbonated.Data.Tests
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record2));
         }
 
-        // convert guids
+        [Test]
+        public void ConvertGuids()
+        {
+            var record = Record(("foo", null), ("bar", DBNull.Value), ("baz", "10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"));
 
-        // convert nullable guids
+            var mapper = new PropertyMapper<GuidEntity>();
+            var inst = mapper.CreateInstance(record);
 
-        // throw when invalid guid value is passed
+            Assert.AreEqual(Guid.Empty, inst.Foo);
+            Assert.AreEqual(Guid.Empty, inst.Bar);
+            Assert.AreEqual(new Guid("10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"), inst.Baz);
+        }
+
+        [Test]
+        public void ConvertNullableGuids()
+        {
+            var record = Record(("foo", null), ("bar", string.Empty), ("baz", "10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"));
+
+            var mapper = new PropertyMapper<NullableGuidEntity>();
+            var inst = mapper.CreateInstance(record);
+
+            Assert.IsNull(inst.Foo);
+            Assert.IsNull(inst.Bar);
+            Assert.AreEqual(new Guid("10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"), inst.Baz);
+        }
+
+        [Test]
+        public void ThrowWhenRecordHasInvalidGuidValue()
+        {
+            var record = Record(("foo", "bogusguid"));
+
+            var mapper = new PropertyMapper<GuidEntity>();
+
+            Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
+        }
 
         // convert empty char columns as char default
 
@@ -295,6 +325,20 @@ namespace Carbonated.Data.Tests
             public Shapes Shape { get; set; }
             public Colors OtherColor { get; set; }
             public Shapes OtherShape { get; set; }
+        }
+
+        class GuidEntity
+        {
+            public Guid Foo { get; set; }
+            public Guid Bar { get; set; }
+            public Guid Baz { get; set; }
+        }
+
+        class NullableGuidEntity
+        {
+            public Guid? Foo { get; set; }
+            public Guid? Bar { get; set; }
+            public Guid? Baz { get; set; }
         }
 
         #endregion

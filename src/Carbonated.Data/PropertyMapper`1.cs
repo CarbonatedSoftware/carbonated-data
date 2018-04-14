@@ -140,13 +140,24 @@ namespace Carbonated.Data
                 }
                 else
                 {
+                    Type propertyType = prop.PropertyType;
+                    if (IsNullable(propertyType))
+                    {
+                        // If we have a nullable type, extract it so that our type comparisons below work.
+                        propertyType = Nullable.GetUnderlyingType(propertyType);
+                    }
+
                     if (value == null || value is DBNull)
                     {
                         prop.SetValue(instance, null);
                     }
-                    else if (prop.PropertyType.IsEnum)
+                    else if (propertyType.IsEnum)
                     {
-                        prop.SetValue(instance, ConvertEnum(value, prop.PropertyType));
+                        prop.SetValue(instance, ConvertEnum(value, propertyType));
+                    }
+                    else if (propertyType == typeof(Guid))
+                    {
+                        prop.SetValue(instance, ConvertGuid(value));
                     }
                     else
                     {
@@ -159,6 +170,9 @@ namespace Carbonated.Data
             return instance;
         }
 
+        private bool IsNullable(Type type) 
+            => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+
         private object ConvertEnum(object value, Type propertyType)
         {
             if (Enum.IsDefined(propertyType, value))
@@ -170,6 +184,22 @@ namespace Carbonated.Data
                 return null;
             }
             throw new BindingException($"Value could not be parsed as {propertyType.Name}: {value}");
+        }
+
+        private object ConvertGuid(object value)
+        {
+            // Empty string should be treated as nulls.
+            if (value.ToString() == string.Empty)
+            {
+                return null;
+            }
+
+            if (Guid.TryParse(value.ToString(), out Guid guid))
+            {
+                return guid;
+            }
+
+            throw new BindingException($"Value could not be parsed as {typeof(Guid).Name}: {value}");
         }
     }
 }
