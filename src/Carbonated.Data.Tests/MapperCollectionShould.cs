@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Carbonated.Data.Tests
 {
@@ -13,10 +8,34 @@ namespace Carbonated.Data.Tests
         [Test]
         public void TrackMappersThatHaveBeenAdded()
         {
-            var mc = new MapperCollection();
-            mc.Add(new PropertyMapper<Entity>());
+            var mcol = new MapperCollection();
+            mcol.Add(new PropertyMapper<Entity>());
 
-            Assert.IsTrue(mc.HasMapper<Entity>());
+            Assert.IsTrue(mcol.HasMapper<Entity>());
         }
+
+        [Test]
+        public void AutoGenerateAndAddPropertyMapperDuringGetIfNotYetRegistered()
+        {
+            var mcol = new MapperCollection();
+
+            Assert.IsFalse(mcol.HasMapper<Entity>());
+
+            var mapper = mcol.Get<Entity>();
+
+            Assert.IsTrue(mcol.HasMapper<Entity>());
+            Assert.IsInstanceOf<PropertyMapper<Entity>>(mapper);
+        }
+
+        [Test]
+        public void ThrowOnAddIfTypeIsAlreadyRegistered()
+        {
+            var mcol = new MapperCollection();
+            mcol.Add(new PropertyMapper<Entity>());
+
+            Assert.Throws<MappingException>(() => mcol.Add(new PropertyMapper<Entity>()));
+        }
+
+        //TODO: system value types should be pre-registered
     }
 }
