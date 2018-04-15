@@ -18,3 +18,22 @@ DbFactory - Interface that DB platform specific libraries will implement to crea
 ParamGenerator - Generates save parameters for an entity.
 
 ParamGeneratorMapper - Mapping for the param generator.
+
+## v1.0 TODO
+
+* Connector/Context
+* Db Object Factory
+* SQL Server tests and implementation
+* Simple param list builder in connector
+* Add and copy edit code comments for all public members
+* NuGet package setup and build scripting
+* Documentation and examples
+  * README / intro doc
+  * Complete public interface documentation
+  * Design notes
+  * Examples, including separate example solution with reference implementations
+
+### v1.next
+
+* Param Generator for save parameters
+* Query<dynamic> methods
