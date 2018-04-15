@@ -53,6 +53,14 @@ namespace Carbonated.Data.Tests
         }
 
         [Test]
+        public void GetValueWhenNonNormalizedNameIsPassed()
+        {
+            var record = Record(("foo", 1));
+
+            Assert.AreEqual(1, record.GetValue("f_oo"));
+        }
+
+        [Test]
         public void ReturnNullFromGetValueWhenFieldIsNotFound()
         {
             var record = Record(("Foo", 1));
