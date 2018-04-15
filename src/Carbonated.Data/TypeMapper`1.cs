@@ -13,6 +13,6 @@ namespace Carbonated.Data
         /// </summary>
         public Func<Record, TEntity> Creator { get; set; }
 
-        public TEntity CreateInstance(Record record) => Creator(record);
+        protected internal override TEntity CreateInstance(Record record) => Creator(record);
     }
 }

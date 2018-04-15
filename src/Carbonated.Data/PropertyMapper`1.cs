@@ -126,7 +126,7 @@ namespace Carbonated.Data
             }
         }
 
-        public TEntity CreateInstance(Record record)
+        protected internal override TEntity CreateInstance(Record record)
         {
             var instance = Activator.CreateInstance<TEntity>();
             foreach (var mapping in Mappings.Where(m => !m.IsIgnored))
