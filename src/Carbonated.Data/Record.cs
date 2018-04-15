@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Carbonated.Data
 {
@@ -65,7 +63,80 @@ namespace Carbonated.Data
 
         public object this[int i] => dataReader[i];
 
-        #region IDataRecord explicit implementation - we want to hide this away
+        public bool IsDBNull(string name) => dataReader.IsDBNull(GetIndex(name));
+
+        #region Name-based getters
+
+        /* ----------------------------------------------------------------
+         * Name-based getters for the data types supported by IDataRecord are provided so
+         * that TypeMapper and other custom data access consumers can easily get values by
+         * name. There are also ..OrDefault() variants provided for all supported getters to
+         * simplify that common pattern.
+         */
+
+        public bool GetBoolean(string name) => dataReader.GetBoolean(GetIndex(name));
+
+        public byte GetByte(string name) => dataReader.GetByte(GetIndex(name));
+
+        public char GetChar(string name) => dataReader.GetChar(GetIndex(name));
+
+        public DateTime GetDateTime(string name) => dataReader.GetDateTime(GetIndex(name));
+
+        public decimal GetDecimal(string name) => dataReader.GetDecimal(GetIndex(name));
+
+        public double GetDouble(string name) => dataReader.GetDouble(GetIndex(name));
+
+        public float GetFloat(string name) => dataReader.GetFloat(GetIndex(name));
+
+        public Guid GetGuid(string name) => dataReader.GetGuid(GetIndex(name));
+
+        public short GetInt16(string name) => dataReader.GetInt16(GetIndex(name));
+
+        public int GetInt32(string name) => dataReader.GetInt32(GetIndex(name));
+
+        public long GetInt64(string name) => dataReader.GetInt64(GetIndex(name));
+
+        public string GetString(string name) => dataReader.GetString(GetIndex(name));
+
+
+        public bool GetBooleanOrDefault(string name) => GetValueOrDefault(dataReader.GetBoolean, name);
+
+        public byte GetByteOrDefault(string name) => GetValueOrDefault(dataReader.GetByte, name);
+
+        public char GetCharOrDefault(string name) => GetValueOrDefault(dataReader.GetChar, name);
+
+        public DateTime GetDateTimeOrDefault(string name) => GetValueOrDefault(dataReader.GetDateTime, name);
+
+        public decimal GetDecimalOrDefault(string name) => GetValueOrDefault(dataReader.GetDecimal, name);
+
+        public double GetDoubleOrDefault(string name) => GetValueOrDefault(dataReader.GetDouble, name);
+
+        public float GetFloatOrDefault(string name) => GetValueOrDefault(dataReader.GetFloat, name);
+
+        public Guid GetGuidOrDefault(string name) => GetValueOrDefault(dataReader.GetGuid, name);
+
+        public short GetInt16OrDefault(string name) => GetValueOrDefault(dataReader.GetInt16, name);
+
+        public int GetInt32OrDefault(string name) => GetValueOrDefault(dataReader.GetInt32, name);
+
+        public long GetInt64OrDefault(string name) => GetValueOrDefault(dataReader.GetInt64, name);
+
+        public string GetStringOrDefault(string name) => GetValueOrDefault(dataReader.GetString, name);
+
+
+        private T GetValueOrDefault<T>(Func<int, T> getterFunction, string name)
+        {
+            return HasField(name) && !IsDBNull(name) ? getterFunction(GetIndex(name)) : default(T);
+        }
+
+        #endregion
+
+        #region IDataRecord explicit implementation
+
+        /*-----------------------------------------------------------------
+         * IDataRecord is explicitly implemented so that it is available to consuming code
+         * if needed by casting the Record to IDataRecord.
+         */
 
         object IDataRecord.this[int i] => dataReader[i];
 

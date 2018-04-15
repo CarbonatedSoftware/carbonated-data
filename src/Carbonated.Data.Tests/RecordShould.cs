@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using static Carbonated.Data.Tests.SharedMethods;
 
 namespace Carbonated.Data.Tests
@@ -66,6 +67,30 @@ namespace Carbonated.Data.Tests
 
             Assert.AreEqual(0, record.GetIndex("foo"));
             Assert.AreEqual(-1, record.GetIndex("bar"));
+        }
+
+        [Test]
+        public void GetTypesByName()
+        {
+            var record = Record(("bool", true), ("byte", (byte)1), ("char", 'a'));
+
+            Assert.AreEqual(true, record.GetBoolean("bool"));
+            Assert.AreEqual(1, record.GetByte("byte"));
+            Assert.AreEqual('a', record.GetChar("char"));
+        }
+
+        [Test]
+        public void GetTypeOrDefaultByName()
+        {
+            var record = Record(("bool1", true), ("bool2", DBNull.Value), ("dec1", 42m), ("dec2", DBNull.Value));
+
+            Assert.IsTrue(record.GetBooleanOrDefault("bool1"));
+            Assert.IsFalse(record.GetBooleanOrDefault("bool2"));
+            Assert.IsFalse(record.GetBooleanOrDefault("missing"));
+
+            Assert.AreEqual(42, record.GetDecimalOrDefault("dec1"));
+            Assert.AreEqual(0, record.GetDecimalOrDefault("dec2"));
+            Assert.AreEqual(0, record.GetDecimalOrDefault("missing"));
         }
     }
 }
