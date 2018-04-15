@@ -8,6 +8,11 @@ namespace Carbonated.Data
     /// <typeparam name="TEntity">The type of entity being mapped.</typeparam>
     public class TypeMapper<TEntity> : Mapper<TEntity>
     {
+        public TypeMapper(Func<Record, TEntity> creator)
+        {
+            Creator = creator;
+        }
+
         /// <summary>
         /// Custom function that takes in a record and returns an instance of the entity.
         /// </summary>

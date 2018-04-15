@@ -12,7 +12,7 @@ namespace Carbonated.Data.Tests
             var dataRecord = new MockDataRecord();
             var dataReader = new MockDataReader(dataRecord);
 
-            var mapper = new TypeMapper<Entity>() { Creator = r => new Entity() { Id = 3 } };
+            var mapper = new TypeMapper<Entity>(r => new Entity() { Id = 3 });
             var reader = new EntityReader<Entity>(dataReader, mapper);
 
             var inst = reader.First();

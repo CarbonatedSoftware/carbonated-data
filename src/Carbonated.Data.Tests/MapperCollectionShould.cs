@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace Carbonated.Data.Tests
 {
@@ -36,6 +37,36 @@ namespace Carbonated.Data.Tests
             Assert.Throws<MappingException>(() => mcol.Add(new PropertyMapper<Entity>()));
         }
 
-        //TODO: system value types should be pre-registered
+        [Test]
+        public void HaveFrameworkTypeMappersBuiltIn()
+        {
+            var mcol = new MapperCollection();
+
+            Assert.IsTrue(mcol.HasMapper<bool>());
+            Assert.IsTrue(mcol.HasMapper<byte>());
+            Assert.IsTrue(mcol.HasMapper<short>());
+            Assert.IsTrue(mcol.HasMapper<int>());
+            Assert.IsTrue(mcol.HasMapper<long>());
+            Assert.IsTrue(mcol.HasMapper<float>());
+            Assert.IsTrue(mcol.HasMapper<double>());
+            Assert.IsTrue(mcol.HasMapper<decimal>());
+            Assert.IsTrue(mcol.HasMapper<DateTime>());
+            Assert.IsTrue(mcol.HasMapper<Guid>());
+            Assert.IsTrue(mcol.HasMapper<char>());
+            Assert.IsTrue(mcol.HasMapper<string>());
+            Assert.IsTrue(mcol.HasMapper<byte[]>());
+
+            Assert.IsTrue(mcol.HasMapper<bool?>());
+            Assert.IsTrue(mcol.HasMapper<byte?>());
+            Assert.IsTrue(mcol.HasMapper<short?>());
+            Assert.IsTrue(mcol.HasMapper<int?>());
+            Assert.IsTrue(mcol.HasMapper<long?>());
+            Assert.IsTrue(mcol.HasMapper<float?>());
+            Assert.IsTrue(mcol.HasMapper<double?>());
+            Assert.IsTrue(mcol.HasMapper<decimal?>());
+            Assert.IsTrue(mcol.HasMapper<DateTime?>());
+            Assert.IsTrue(mcol.HasMapper<Guid?>());
+            Assert.IsTrue(mcol.HasMapper<char?>());
+        }
     }
 }
