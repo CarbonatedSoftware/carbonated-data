@@ -21,8 +21,8 @@ ParamGeneratorMapper - Mapping for the param generator.
 
 ## v1.0 TODO
 
-* Connector/Context
-* Db Object Factory
+* ~~Connector/Context~~
+* ~~Db Object Factory~~
 * SQL Server tests and implementation
 * Simple param list builder in connector
 * Add and copy edit code comments for all public members
@@ -35,5 +35,6 @@ ParamGeneratorMapper - Mapping for the param generator.
 
 ### v1.next
 
+* QueryTable support in Connector
 * Param Generator for save parameters
-* Query<dynamic> methods
+* Query<dynamic> in Connector
