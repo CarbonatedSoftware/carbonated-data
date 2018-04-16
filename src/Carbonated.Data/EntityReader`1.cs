@@ -33,6 +33,11 @@ namespace Carbonated.Data
         public void Dispose() => dataReader.Dispose();
 
         /// <summary>
+        /// Gets a value indicating whether the reader is closed.
+        /// </summary>
+        public bool IsClosed => dataReader.IsClosed;
+
+        /// <summary>
         /// Returns the enumerator over the data reader. The reader will close when the
         /// source data reader has no more records.
         /// </summary>
