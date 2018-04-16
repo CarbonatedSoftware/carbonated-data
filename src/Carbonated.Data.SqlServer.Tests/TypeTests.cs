@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Carbonated.Data.SqlServer.Tests
@@ -155,7 +152,67 @@ namespace Carbonated.Data.SqlServer.Tests
             CollectionAssert.AreEqual(expected, values);
         }
 
-        #region Nullable types
+        [Test]
+        public void QueryEntities()
+        {
+            var entities = connector.Query<TypeTest>("select * from type_test order by id").ToArray();
+
+            var nulls = entities[0];
+            var empties = entities[1];
+            var values = entities[2];
+
+            Assert.IsFalse(nulls.Bool);
+            Assert.AreEqual(0, nulls.Byte);
+            Assert.AreEqual(0, nulls.Short);
+            Assert.AreEqual(0, nulls.Int);
+            Assert.AreEqual(0, nulls.Long);
+            Assert.AreEqual(0, nulls.Float);
+            Assert.AreEqual(0, nulls.Double);
+            Assert.AreEqual(0, nulls.Decimal);
+            Assert.AreEqual(DateTime.MinValue, nulls.DateTime);
+            Assert.AreEqual(Guid.Empty, nulls.GuidAsString);
+            Assert.AreEqual(Guid.Empty, nulls.GuidAsUniqueId);
+            Assert.AreEqual('\0', nulls.Char);
+            Assert.IsNull(nulls.String);
+            Assert.IsNull(nulls.ByteArray);
+            Assert.AreEqual(Numbers.Zero, nulls.IntEnum);
+            Assert.AreEqual(Colors.Red, nulls.StringEnum);
+
+            Assert.IsFalse(empties.Bool);
+            Assert.AreEqual(0, empties.Byte);
+            Assert.AreEqual(0, empties.Short);
+            Assert.AreEqual(0, empties.Int);
+            Assert.AreEqual(0, empties.Long);
+            Assert.AreEqual(0, empties.Float);
+            Assert.AreEqual(0, empties.Double);
+            Assert.AreEqual(0, empties.Decimal);
+            Assert.AreEqual(new DateTime(2018, 4, 2, 13, 14, 15), empties.DateTime);
+            Assert.AreEqual(Guid.Empty, empties.GuidAsString);
+            Assert.AreEqual(Guid.Empty, empties.GuidAsUniqueId);
+            Assert.AreEqual('\0', empties.Char);
+            Assert.AreEqual(string.Empty, empties.String);
+            CollectionAssert.AreEqual(null, empties.ByteArray);
+            Assert.AreEqual(Numbers.Zero, empties.IntEnum);
+            Assert.AreEqual(Colors.Red, empties.StringEnum);
+
+            Assert.IsTrue(values.Bool);
+            Assert.AreEqual(1, values.Byte);
+            Assert.AreEqual(2, values.Short);
+            Assert.AreEqual(3, values.Int);
+            Assert.AreEqual(5, values.Long);
+            Assert.AreEqual(8.13f, values.Float);
+            Assert.AreEqual(21.34, values.Double);
+            Assert.AreEqual(55.89m, values.Decimal);
+            Assert.AreEqual(new DateTime(2018, 4, 2, 13, 14, 15), values.DateTime);
+            Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), values.GuidAsString);
+            Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), values.GuidAsUniqueId);
+            Assert.AreEqual('c', values.Char);
+            Assert.AreEqual("str", values.String);
+            CollectionAssert.AreEqual(new byte[] { 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 }, values.ByteArray);
+            Assert.AreEqual(Numbers.Three, values.IntEnum);
+            Assert.AreEqual(Colors.Green, values.StringEnum);
+        }
+
 
         [Test]
         public void QueryNullableBool()
@@ -271,6 +328,101 @@ namespace Carbonated.Data.SqlServer.Tests
             CollectionAssert.AreEqual(new char?[] { null, null, 'c' }, values);
         }
 
-        #endregion
+        [Test]
+        public void QueryNullableEntities()
+        {
+            var entities = connector.Query<NullableTypeTest>("select * from type_test order by id").ToArray();
+
+            var nulls = entities[0];
+            var empties = entities[1];
+            var values = entities[2];
+
+            Assert.IsNull(nulls.Bool);
+            Assert.IsNull(nulls.Byte);
+            Assert.IsNull(nulls.Short);
+            Assert.IsNull(nulls.Int);
+            Assert.IsNull(nulls.Long);
+            Assert.IsNull(nulls.Float);
+            Assert.IsNull(nulls.Double);
+            Assert.IsNull(nulls.Decimal);
+            Assert.IsNull(nulls.DateTime);
+            Assert.IsNull(nulls.GuidAsString);
+            Assert.IsNull(nulls.GuidAsUniqueId);
+            Assert.IsNull(nulls.Char);
+            Assert.IsNull(nulls.IntEnum);
+            Assert.IsNull(nulls.StringEnum);
+
+            Assert.IsFalse(empties.Bool);
+            Assert.AreEqual(0, empties.Byte);
+            Assert.AreEqual(0, empties.Short);
+            Assert.AreEqual(0, empties.Int);
+            Assert.AreEqual(0, empties.Long);
+            Assert.AreEqual(0, empties.Float);
+            Assert.AreEqual(0, empties.Double);
+            Assert.AreEqual(0, empties.Decimal);
+            Assert.AreEqual(new DateTime(2018, 4, 2, 13, 14, 15), empties.DateTime);
+            Assert.IsNull(empties.GuidAsString);
+            Assert.IsNull(empties.GuidAsUniqueId);
+            Assert.IsNull(empties.Char);
+            Assert.AreEqual(Numbers.Zero, empties.IntEnum);
+            Assert.IsNull(empties.StringEnum);
+
+            Assert.IsTrue(values.Bool);
+            Assert.AreEqual(1, values.Byte);
+            Assert.AreEqual(2, values.Short);
+            Assert.AreEqual(3, values.Int);
+            Assert.AreEqual(5, values.Long);
+            Assert.AreEqual(8.13f, values.Float);
+            Assert.AreEqual(21.34, values.Double);
+            Assert.AreEqual(55.89m, values.Decimal);
+            Assert.AreEqual(new DateTime(2018, 4, 2, 13, 14, 15), values.DateTime);
+            Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), values.GuidAsString);
+            Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), values.GuidAsUniqueId);
+            Assert.AreEqual('c', values.Char);
+            Assert.AreEqual(Numbers.Three, values.IntEnum);
+            Assert.AreEqual(Colors.Green, values.StringEnum);
+        }
+
+
+        class TypeTest
+        {
+            public bool Bool { get; set; }
+            public byte Byte { get; set; }
+            public short Short { get; set; }
+            public int Int { get; set; }
+            public long Long { get; set; }
+            public float Float { get; set; }
+            public double Double { get; set; }
+            public decimal Decimal { get; set; }
+            public DateTime DateTime { get; set; }
+            public Guid GuidAsString { get; set; }
+            public Guid GuidAsUniqueId { get; set; }
+            public char Char { get; set; }
+            public string String { get; set; }
+            public byte[] ByteArray { get; set; }
+            public Numbers IntEnum { get; set; }
+            public Colors StringEnum { get; set; }
+        }
+
+        class NullableTypeTest
+        {
+            public bool? Bool { get; set; }
+            public byte? Byte { get; set; }
+            public short? Short { get; set; }
+            public int? Int { get; set; }
+            public long? Long { get; set; }
+            public float? Float { get; set; }
+            public double? Double { get; set; }
+            public decimal? Decimal { get; set; }
+            public DateTime? DateTime { get; set; }
+            public Guid? GuidAsString { get; set; }
+            public Guid? GuidAsUniqueId { get; set; }
+            public char? Char { get; set; }
+            public Numbers? IntEnum { get; set; }
+            public Colors? StringEnum { get; set; }
+        }
+
+        enum Numbers { Zero, One, Two, Three, Four }
+        enum Colors { Red, Blue, Green, Yellow }
     }
 }
