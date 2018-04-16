@@ -80,10 +80,20 @@ namespace Carbonated.Data
 
         public int NonQuery(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            using (var cn = dbFactory.OpenConnection(connectionString))
-            using (var cmd = MakeCommand(sql, cn, parameters))
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            try
             {
-                return cmd.ExecuteNonQuery();
+                using (var cmd = MakeCommand(sql, cn, parameters))
+                {
+                    return cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (!isContext)
+                {
+                    cn.Close();
+                }
             }
         }
 
@@ -105,10 +115,20 @@ namespace Carbonated.Data
 
         public DbDataReader QueryReader(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            using (var cn = dbFactory.OpenConnection(connectionString))
-            using (var cmd = MakeCommand(sql, cn, parameters))
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            try
             {
-                return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                using (var cmd = MakeCommand(sql, cn, parameters))
+                {
+                    return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                }
+            }
+            finally
+            {
+                if (!isContext)
+                {
+                    cn.Close();
+                }
             }
         }
 
@@ -125,10 +145,20 @@ namespace Carbonated.Data
 
         public object QueryScalar(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            using (var cn = dbFactory.OpenConnection(connectionString))
-            using (var cmd = MakeCommand(sql, cn, parameters))
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            try
             {
-                return cmd.ExecuteScalar();
+                using (var cmd = MakeCommand(sql, cn, parameters))
+                {
+                    return cmd.ExecuteScalar();
+                }
+            }
+            finally
+            {
+                if (!isContext)
+                {
+                    cn.Close();
+                }
             }
         }
 
