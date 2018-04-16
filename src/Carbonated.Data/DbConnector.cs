@@ -103,7 +103,6 @@ namespace Carbonated.Data
         public IEnumerable<TEntity> Query<TEntity>(string sql, IEnumerable<DbParameter> parameters = null) 
             => QueryReader<TEntity>(sql, parameters).ToList();
 
-
         public EntityReader<TEntity> QueryReader<TEntity>(string sql, params (string name, object value)[] parameters) 
             => QueryReader<TEntity>(sql, dbFactory.CreateParameters(parameters));
 
@@ -116,19 +115,12 @@ namespace Carbonated.Data
         public DbDataReader QueryReader(string sql, IEnumerable<DbParameter> parameters = null)
         {
             var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
-            try
+            using (var cmd = MakeCommand(sql, cn, parameters))
             {
-                using (var cmd = MakeCommand(sql, cn, parameters))
-                {
-                    return cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                }
-            }
-            finally
-            {
-                if (!isContext)
-                {
-                    cn.Close();
-                }
+                // Set the behavior to close the connection when the reader is disposed if
+                // we're not in a context.
+                var behavior = isContext ? CommandBehavior.Default : CommandBehavior.CloseConnection;
+                return cmd.ExecuteReader(behavior);
             }
         }
 

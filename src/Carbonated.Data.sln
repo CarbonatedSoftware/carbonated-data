@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data", "Carbonat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data.Tests", "Carbonated.Data.Tests\Carbonated.Data.Tests.csproj", "{44F1843E-9925-4498-8542-70EEC9F4194F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data.SqlServer", "Carbonated.Data.SqlServer\Carbonated.Data.SqlServer.csproj", "{E61365DF-790F-463C-ACEB-43EDC671FBB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data.SqlServer.Tests", "Carbonated.Data.SqlServer.Tests\Carbonated.Data.SqlServer.Tests.csproj", "{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +25,19 @@ Global
 		{44F1843E-9925-4498-8542-70EEC9F4194F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44F1843E-9925-4498-8542-70EEC9F4194F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44F1843E-9925-4498-8542-70EEC9F4194F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E61365DF-790F-463C-ACEB-43EDC671FBB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E61365DF-790F-463C-ACEB-43EDC671FBB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E61365DF-790F-463C-ACEB-43EDC671FBB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E61365DF-790F-463C-ACEB-43EDC671FBB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0192482D-391B-4AE4-9E88-642C215D9553}
 	EndGlobalSection
 EndGlobal

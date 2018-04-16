@@ -75,8 +75,8 @@ namespace Carbonated.Data
             mappers.Add(new TypeMapper<double>(GetValue<double>));
             mappers.Add(new TypeMapper<decimal>(GetValue<decimal>));
             mappers.Add(new TypeMapper<DateTime>(GetValue<DateTime>));
-            mappers.Add(new TypeMapper<Guid>(GetValue<Guid>));
-            mappers.Add(new TypeMapper<char>(GetValue<char>));
+            mappers.Add(new TypeMapper<Guid>(GetGuid));
+            mappers.Add(new TypeMapper<char>(GetChar));
             mappers.Add(new TypeMapper<string>(GetValue<string>));
             mappers.Add(new TypeMapper<byte[]>(GetValue<byte[]>));
 
@@ -98,5 +98,24 @@ namespace Carbonated.Data
 
         private T GetNullableValue<T>(IDataRecord record) 
             => record.IsDBNull(0) ? default(T) : (T)Convert.ChangeType(record.GetValue(0), Nullable.GetUnderlyingType(typeof(T)));
+
+        private Guid GetGuid(IDataRecord record)
+        {
+            // If we're using SQL Server and the Guid is backed by a UniqueIdentifier
+            // column, we can use GetValue. If it's backed by a string, we need to parse it
+            // directly because ChangeType doesn't have a string => Guid conversion.
+            if (record.GetFieldType(0) == typeof(Guid))
+            {
+                return GetValue<Guid>(record);
+            }
+            return record.IsDBNull(0) || string.IsNullOrEmpty(record.GetString(0)) ? Guid.Empty : Guid.Parse(record.GetString(0));
+        }
+
+        private char GetChar(IDataRecord record)
+        {
+            // The SqlServer record treats all CHAR columns as strings, so we need to get
+            // char values as strings.
+            return record.IsDBNull(0) || string.IsNullOrEmpty(record.GetString(0)) ? default(char) : record.GetString(0)[0];
+        }
     }
 }
