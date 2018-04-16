@@ -89,8 +89,8 @@ namespace Carbonated.Data
             mappers.Add(new TypeMapper<double?>(GetNullableValue<double?>));
             mappers.Add(new TypeMapper<decimal?>(GetNullableValue<decimal?>));
             mappers.Add(new TypeMapper<DateTime?>(GetNullableValue<DateTime?>));
-            mappers.Add(new TypeMapper<Guid?>(GetNullableValue<Guid?>));
-            mappers.Add(new TypeMapper<char?>(GetNullableValue<char?>));
+            mappers.Add(new TypeMapper<Guid?>(GetNullableGuid));
+            mappers.Add(new TypeMapper<char?>(GetNullableChar));
         }
 
         private T GetValue<T>(IDataRecord record) 
@@ -111,11 +111,28 @@ namespace Carbonated.Data
             return record.IsDBNull(0) || string.IsNullOrEmpty(record.GetString(0)) ? Guid.Empty : Guid.Parse(record.GetString(0));
         }
 
+        private Guid? GetNullableGuid(IDataRecord record)
+        {
+            // See note in GetGuid for details about parsing string values. We also need to
+            // ensure that DbNull gets converted to null.
+            if (record.GetFieldType(0) == typeof(Guid))
+            {
+                return record.IsDBNull(0) ? null : (Guid?)record.GetGuid(0);
+            }
+            return record.IsDBNull(0) || string.IsNullOrEmpty(record.GetString(0)) ? null : (Guid?)Guid.Parse(record.GetString(0));
+        }
+
         private char GetChar(IDataRecord record)
         {
             // The SqlServer record treats all CHAR columns as strings, so we need to get
             // char values as strings.
             return record.IsDBNull(0) || string.IsNullOrEmpty(record.GetString(0)) ? default(char) : record.GetString(0)[0];
+        }
+
+        private char? GetNullableChar(IDataRecord record)
+        {
+            // Same basic logic as GetChar, but returning null instead of default for nulls.
+            return record.IsDBNull(0) || string.IsNullOrEmpty(record.GetString(0)) ? null : (char?)record.GetString(0)[0];
         }
     }
 }
