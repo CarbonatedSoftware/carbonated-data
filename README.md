@@ -23,10 +23,10 @@ ParamGeneratorMapper - Mapping for the param generator.
 
 * ~~Connector/Context~~
 * ~~Db Object Factory~~
-* SQL Server tests and implementation
+* ~~SQL Server tests and implementation~~
 * Simple param list builder in connector
 * Add and copy edit code comments for all public members
-* NuGet package setup and build scripting
+* ~~NuGet package setup and build scripting~~
 * Documentation and examples
   * README / intro doc
   * Complete public interface documentation
