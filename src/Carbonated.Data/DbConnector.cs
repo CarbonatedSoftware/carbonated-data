@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Carbonated.Data
 {
@@ -30,8 +29,11 @@ namespace Carbonated.Data
 
         public int NonQuery(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            //TODO: This one actually needs to do something.
-            return 0;
+            using (var cn = dbObjectFactory.OpenConnection(connectionString))
+            using (var cmd = MakeCommand(sql, cn, parameters))
+            {
+                return cmd.ExecuteNonQuery();
+            }
         }
 
         public IEnumerable<TEntity> Query<TEntity>(string sql, params (string name, object value)[] parameters) 
@@ -44,19 +46,19 @@ namespace Carbonated.Data
         public EntityReader<TEntity> QueryReader<TEntity>(string sql, params (string name, object value)[] parameters) 
             => QueryReader<TEntity>(sql, dbObjectFactory.CreateParameters(parameters));
 
-        public EntityReader<TEntity> QueryReader<TEntity>(string sql, IEnumerable<DbParameter> parameters = null)
-        {
-            //TODO: This one actually needs to do something.
-            return null;
-        }
+        public EntityReader<TEntity> QueryReader<TEntity>(string sql, IEnumerable<DbParameter> parameters = null) 
+            => new EntityReader<TEntity>(QueryReader(sql, parameters), Mappers.Get<TEntity>());
 
         public DbDataReader QueryReader(string sql, params (string name, object value)[] parameters) 
             => QueryReader(sql, dbObjectFactory.CreateParameters(parameters));
 
         public DbDataReader QueryReader(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            //TODO: This one actually needs to do something.
-            return null;
+            using (var cn = dbObjectFactory.OpenConnection(connectionString))
+            using (var cmd = MakeCommand(sql, cn, parameters))
+            {
+                return cmd.ExecuteReader(CommandBehavior.CloseConnection);
+            }
         }
 
         public TResult QueryScalar<TResult>(string sql, params (string name, object value)[] parameters) 
@@ -72,11 +74,37 @@ namespace Carbonated.Data
 
         public object QueryScalar(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            //TODO: This one actually needs to do something.
-            return null;
+            using (var cn = dbObjectFactory.OpenConnection(connectionString))
+            using (var cmd = MakeCommand(sql, cn, parameters))
+            {
+                return cmd.ExecuteScalar();
+            }
         }
 
-        // QueryTable
-        // SaveTable
+        public DataTable QueryTable(string sql, params (string name, object value)[] parameters) 
+            => QueryTable(sql, dbObjectFactory.CreateParameters(parameters));
+
+        public DataTable QueryTable(string sql, IEnumerable<DbParameter> parameters)
+        {
+            throw new NotImplementedException("Coming soon.");
+        }
+
+        public int SaveTable(DataTable table)
+        {
+            throw new NotImplementedException("Coming soon.");
+        }
+
+        /// <summary>
+        /// Builds a simple command with the connection and parameters set.
+        /// </summary>
+        private DbCommand MakeCommand(string sql, DbConnection connection, IEnumerable<DbParameter> parameters)
+        {
+            var cmd = dbObjectFactory.CreateCommand(sql, connection, commandTimeout);
+            if (parameters?.Count() > 0)
+            {
+                cmd.Parameters.AddRange(parameters.ToArray());
+            }
+            return cmd;
+        }
     }
 }
