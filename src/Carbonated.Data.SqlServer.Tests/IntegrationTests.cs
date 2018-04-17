@@ -115,6 +115,38 @@ namespace Carbonated.Data.SqlServer.Tests
             Assert.AreEqual("Houston", cities.First().Name);
         }
 
+        [Test]
+        public void QueryAndSaveTable()
+        {
+            // Check initial state
+            int count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
+            Assert.AreEqual(0, count);
+
+            // Load the table and add a row
+            var cities = connector.QueryTable("select * from cities");
+
+            var row = cities.NewRow();
+            row["id"] = 13;
+            row["name"] = "Jacksonville";
+            row["state"] = "FL";
+            row["population"] = 842583;
+            cities.Rows.Add(row);
+
+            connector.SaveTable(cities);
+
+            // Verify that the row was added
+            var flCities = connector.QueryTable("select * from cities where state = 'FL'");
+            Assert.AreEqual(1, flCities.Rows.Count);
+
+            // Restore test data state to starting point
+            flCities.Rows[0].Delete();
+            connector.SaveTable(flCities);
+
+            // Verify that we're back to our starting point
+            count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
+            Assert.AreEqual(0, count);
+        }
+
         class City
         {
             public int Id { get; set; }

@@ -262,7 +262,25 @@ namespace Carbonated.Data
         /// <returns>The data table result.</returns>
         public DataTable QueryTable(string sql, IEnumerable<DbParameter> parameters)
         {
-            throw new NotImplementedException("Coming soon.");
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            try
+            {
+                using (var cmd = MakeCommand(sql, cn, parameters))
+                using (var adapter = dbFactory.CreateDataAdapter(cmd))
+                {
+                    var table = new DataTable();
+                    adapter.FillSchema(table, SchemaType.Source); // Load schema so that we get key data.
+                    adapter.Fill(table);
+                    return table;
+                }
+            }
+            finally
+            {
+                if (!isContext)
+                {
+                    cn.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -274,7 +292,27 @@ namespace Carbonated.Data
         /// <exception cref="Exception">Thrown if no primary key is defined.</exception>
         public int SaveTable(DataTable table)
         {
-            throw new NotImplementedException("Coming soon.");
+            if (table.PrimaryKey == null || table.PrimaryKey.Length ==0)
+            {
+                throw new Exception($"Table cannot be saved without primary key: {table.TableName}");
+            }
+
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            try
+            {
+                var sam = new SaveAdapterMaker(dbFactory, commandTimeout);
+                using (var adapter = sam.MakeAdapter(table, cn))
+                {
+                    return adapter.Update(table);
+                }
+            }
+            finally
+            {
+                if (!isContext)
+                {
+                    cn.Close();
+                }
+            }
         }
 
 

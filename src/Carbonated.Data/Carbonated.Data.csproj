@@ -62,6 +62,7 @@
     <Compile Include="PropertyMapInfo.cs" />
     <Compile Include="PropertyMapper`1.cs" />
     <Compile Include="Record.cs" />
+    <Compile Include="SaveAdapterMaker.cs" />
     <Compile Include="TypeMapper`1.cs" />
   </ItemGroup>
   <ItemGroup>
