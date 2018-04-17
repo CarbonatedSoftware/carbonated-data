@@ -8,7 +8,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[cities](
 	[id] [int] IDENTITY(1,1) NOT NULL,
-	[city] [nvarchar](100) NULL,
+	[name] [nvarchar](100) NULL,
 	[state] [nchar](2) NULL,
 	[population] [int] NULL,
  CONSTRAINT [PK_cities] PRIMARY KEY CLUSTERED 
@@ -48,18 +48,18 @@ CREATE TABLE [dbo].[type_test](
 GO
 
 SET IDENTITY_INSERT [dbo].[cities] ON 
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (1, N'New York', N'NY', 8405837)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (2, N'Los Angeles', N'CA', 3884307)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (3, N'Chicago', N'IL', 2718782)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (4, N'Houston', N'TX', 2195914)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (5, N'Philadelphia', N'PA', 1553165)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (6, N'Phoenix', N'AZ', 1513367)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (7, N'San Antonio', N'TX', 1409019)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (8, N'San Diego', N'CA', 1355896)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (9, N'Dallas', N'TX', 1257676)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (10, N'San Jose', N'CA', 998537)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (11, N'Austin', N'TX', 885400)
-INSERT [dbo].[cities] ([id], [city], [state], [population]) VALUES (12, N'Indianapolis', N'IN', 843393)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (1, N'New York', N'NY', 8405837)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (2, N'Los Angeles', N'CA', 3884307)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (3, N'Chicago', N'IL', 2718782)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (4, N'Houston', N'TX', 2195914)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (5, N'Philadelphia', N'PA', 1553165)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (6, N'Phoenix', N'AZ', 1513367)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (7, N'San Antonio', N'TX', 1409019)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (8, N'San Diego', N'CA', 1355896)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (9, N'Dallas', N'TX', 1257676)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (10, N'San Jose', N'CA', 998537)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (11, N'Austin', N'TX', 885400)
+INSERT [dbo].[cities] ([id], [name], [state], [population]) VALUES (12, N'Indianapolis', N'IN', 843393)
 SET IDENTITY_INSERT [dbo].[cities] OFF
 
 SET IDENTITY_INSERT [dbo].[type_test] ON 

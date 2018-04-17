@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Carbonated.Data.SqlServer</RootNamespace>
     <AssemblyName>Carbonated.Data.SqlServer</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +52,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>nuget pack $(ProjectPath) -Properties Configuration=$(ConfigurationName) -IncludeReferencedProjects -OutputDirectory $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+  nuget pack $(ProjectPath) -Properties Configuration=$(ConfigurationName) -OutputDirectory $(SolutionDir)..\artifacts\
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>

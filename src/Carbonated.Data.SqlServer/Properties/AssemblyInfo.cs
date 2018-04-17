@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Carbonated.Data.SqlServer")]
-[assembly: AssemblyDescription("SqlServer implementation of Carbonated Data")]
+[assembly: AssemblyDescription("SqlServer implementation of Carbonated Data.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Carbonated Software")]
-[assembly: AssemblyProduct("Carbonated.Data.SqlServer")]
+[assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("© 2018 Carbonated Software")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

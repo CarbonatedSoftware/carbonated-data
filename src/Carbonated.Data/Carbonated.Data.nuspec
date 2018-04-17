@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <projectUrl>https://github.com/CarbonatedSoftware/carbonated-data</projectUrl>
+    <licenseUrl>https://github.com/CarbonatedSoftware/carbonated-data/blob/master/LICENSE</licenseUrl>
+  </metadata>
+</package>
