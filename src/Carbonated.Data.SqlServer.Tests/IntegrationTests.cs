@@ -107,8 +107,8 @@ namespace Carbonated.Data.SqlServer.Tests
         [Test]
         public void QueryWithCustomMappings()
         {
-            connector.Mappers.Add(new PropertyMapper<City>()
-                .Map(x => x.Name, "nom"));
+            connector.Mappers.Configure<City>()
+                .Map(x => x.Name, "nom");
 
             var cities = connector.Query<City>("select id, name as nom from cities where state = 'TX'");
 

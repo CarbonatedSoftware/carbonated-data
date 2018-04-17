@@ -13,28 +13,64 @@ namespace Carbonated.Data
     {
         private readonly List<Mapper> mappers = new List<Mapper>();
 
+        /// <summary>
+        /// Constructs a new mapper collection.
+        /// </summary>
         public MapperCollection()
         {
             AddFrameworkTypes();
         }
 
-        /*TODO: Replace Add with a Configure/Register/Annotate method that returns the
-         * mapper being added so that it can be configured directly. Overloads for property
-         * mappers w/ & w/o default condition, and type mappers.
-         */
-
         /// <summary>
-        /// Adds an entity mapper to the collection.
+        /// Adds a property mapper for an entity and returns it for configuration. The default population
+        /// condition for all properties will be Optional.
         /// </summary>
         /// <typeparam name="TEntity">The entity type that the mapper is for.</typeparam>
-        /// <param name="mapper">The mapper to add.</param>
-        public void Add<TEntity>(Mapper<TEntity> mapper)
+        /// <returns>The property mapper being configured.</returns>
+        /// <exception cref="MappingException">Throws if a mapper is already configured for the entity.</exception>
+        public PropertyMapper<TEntity> Configure<TEntity>()
         {
             if (HasMapper<TEntity>())
             {
-                throw new MappingException($"A mapper is already registered for type {typeof(TEntity).Name}");
+                throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
             }
+            var mapper = new PropertyMapper<TEntity>();
             mappers.Add(mapper);
+            return mapper;
+        }
+
+        /// <summary>
+        /// Adds a property mapper for an entity with the default condition specified and returns the mapper
+        /// for configuration.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type that the mapper is for.</typeparam>
+        /// <param name="condition">The default population condition to set for all properties.</param>
+        /// <returns>The property mapper being configured.</returns>
+        /// <exception cref="MappingException">Throws if a mapper is already configured for the entity.</exception>
+        public PropertyMapper<TEntity> Configure<TEntity>(PopulationCondition condition)
+        {
+            if (HasMapper<TEntity>())
+            {
+                throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
+            }
+            var mapper = new PropertyMapper<TEntity>(condition);
+            mappers.Add(mapper);
+            return mapper;
+        }
+
+        /// <summary>
+        /// Adds a Type Mapper for an entity using the specified creator method.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type that the mapper is for.</typeparam>
+        /// <param name="creator">The creator method used to populate the entity from a record.</param>
+        /// <exception cref="MappingException">Throws if a mapper is already configured for the entity.</exception>
+        public void Configure<TEntity>(Func<Record, TEntity> creator)
+        {
+            if (HasMapper<TEntity>())
+            {
+                throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
+            }
+            mappers.Add(new TypeMapper<TEntity>(creator));
         }
 
         /// <summary>

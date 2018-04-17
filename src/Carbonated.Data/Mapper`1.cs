@@ -8,6 +8,9 @@ namespace Carbonated.Data
     /// </summary>
     public abstract class Mapper
     {
+        /// <summary>
+        /// The type of the entity being mapped.
+        /// </summary>
         protected internal Type EntityType { get; set; }
     }
 
@@ -17,6 +20,9 @@ namespace Carbonated.Data
     /// <typeparam name="TEntity">The entity being mapped.</typeparam>
     public abstract class Mapper<TEntity> : Mapper
     {
+        /// <summary>
+        /// Constructs a mapper for an entity.
+        /// </summary>
         public Mapper()
         {
             EntityType = typeof(TEntity);

@@ -17,6 +17,12 @@ namespace Carbonated.Data
         private DbObjectFactory dbFactory;
         private DbConnection contextConnection;
 
+        /// <summary>
+        /// Constructs a DbConnector.
+        /// </summary>
+        /// <param name="objectFactory">The engine-specific object factory to use.</param>
+        /// <param name="connectionString">The connection string to use for queries.</param>
+        /// <param name="commandTimeout">The default command timeout for commands.</param>
         public DbConnector(DbObjectFactory objectFactory, string connectionString, int commandTimeout = 300)
         {
             dbFactory = objectFactory;
@@ -75,9 +81,22 @@ namespace Carbonated.Data
 
         #endregion
 
+
+        /// <summary>
+        /// Executes SQL without returning a result.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The number of rows affected.</returns>
         public int NonQuery(string sql, params (string name, object value)[] parameters) 
             => NonQuery(sql, dbFactory.CreateParameters(parameters));
 
+        /// <summary>
+        /// Executes SQL without returning a result.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The number of rows affected.</returns>
         public int NonQuery(string sql, IEnumerable<DbParameter> parameters = null)
         {
             var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
@@ -97,21 +116,63 @@ namespace Carbonated.Data
             }
         }
 
+
+        /// <summary>
+        /// Execute a SQL query and returns the results as a list of entities.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the results entity.</typeparam>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>A list of entities.</returns>
         public IEnumerable<TEntity> Query<TEntity>(string sql, params (string name, object value)[] parameters) 
             => Query<TEntity>(sql, dbFactory.CreateParameters(parameters));
 
+        /// <summary>
+        /// Execute a SQL query and returns the results as a list of entities.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the results entity.</typeparam>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>A list of entities.</returns>
         public IEnumerable<TEntity> Query<TEntity>(string sql, IEnumerable<DbParameter> parameters = null) 
             => QueryReader<TEntity>(sql, parameters).ToList();
 
+
+        /// <summary>
+        /// Executes a SQL query and returns the results in a reader that returns each row as an entity.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the results entity.</typeparam>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>A typed reader.</returns>
         public EntityReader<TEntity> QueryReader<TEntity>(string sql, params (string name, object value)[] parameters) 
             => QueryReader<TEntity>(sql, dbFactory.CreateParameters(parameters));
 
+        /// <summary>
+        /// Executes a SQL query and returns the results in a reader that returns each row as an entity.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the results entity.</typeparam>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>A typed reader.</returns>
         public EntityReader<TEntity> QueryReader<TEntity>(string sql, IEnumerable<DbParameter> parameters = null) 
             => new EntityReader<TEntity>(QueryReader(sql, parameters), Mappers.Get<TEntity>());
 
+        /// <summary>
+        /// Executes a SQL query and returns the results in a DbDataReader.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>A DbDataReader</returns>
         public DbDataReader QueryReader(string sql, params (string name, object value)[] parameters) 
             => QueryReader(sql, dbFactory.CreateParameters(parameters));
 
+        /// <summary>
+        /// Executes a SQL query and returns the results in a DbDataReader.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>A DbDataReader</returns>
         public DbDataReader QueryReader(string sql, IEnumerable<DbParameter> parameters = null)
         {
             var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
@@ -124,17 +185,46 @@ namespace Carbonated.Data
             }
         }
 
+        /// <summary>
+        /// Executes a SQL query and returns the first row, first column of the result as the desired type.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The scalar result.</returns>
         public TResult QueryScalar<TResult>(string sql, params (string name, object value)[] parameters) 
             => QueryScalar<TResult>(sql, dbFactory.CreateParameters(parameters));
 
-        //TODO: We need to make sure that this converts framework value types in the same
-        // way that the built-ins do for the entity mappers.
-        public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null) 
-            => (TResult)Convert.ChangeType(QueryScalar(sql, parameters), typeof(TResult));
+        /// <summary>
+        /// Executes a SQL query and returns the first row, first column of the result as the desired type.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The scalar result.</returns>
+        public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null)
+        {
+            //TODO: We need to make sure that this converts framework value types in the same
+            // way that the built-ins do for the entity mappers.
 
+            return (TResult)Convert.ChangeType(QueryScalar(sql, parameters), typeof(TResult));
+        }
+
+        /// <summary>
+        /// Executes a SQL query and returns the first row, first column of the result as an object.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The scalar result.</returns>
         public object QueryScalar(string sql, params (string name, object value)[] parameters) 
             => QueryScalar(sql, dbFactory.CreateParameters(parameters));
 
+        /// <summary>
+        /// Executes a SQL query and returns the first row, first column of the result as an object.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The scalar result.</returns>
         public object QueryScalar(string sql, IEnumerable<DbParameter> parameters = null)
         {
             var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
@@ -154,18 +244,39 @@ namespace Carbonated.Data
             }
         }
 
+
+        /// <summary>
+        /// Executes a SQL query and returns the result in a DataTable.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The data table result.</returns>
         public DataTable QueryTable(string sql, params (string name, object value)[] parameters) 
             => QueryTable(sql, dbFactory.CreateParameters(parameters));
 
+        /// <summary>
+        /// Executes a SQL query and returns the result in a DataTable.
+        /// </summary>
+        /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
+        /// <param name="parameters">Parameters for the script, if any.</param>
+        /// <returns>The data table result.</returns>
         public DataTable QueryTable(string sql, IEnumerable<DbParameter> parameters)
         {
             throw new NotImplementedException("Coming soon.");
         }
 
+        /// <summary>
+        /// Saves the contents of a data table to the database. The table must have a primary key defined so
+        /// that Insert, Update, and Delete commands can be generated.
+        /// </summary>
+        /// <param name="table">The table to save.</param>
+        /// <returns>The number of records affected.</returns>
+        /// <exception cref="Exception">Thrown if no primary key is defined.</exception>
         public int SaveTable(DataTable table)
         {
             throw new NotImplementedException("Coming soon.");
         }
+
 
         /// <summary>
         /// Builds a simple command with the connection and parameters set.

@@ -3,8 +3,16 @@ using System.Reflection;
 
 namespace Carbonated.Data
 {
+    /// <summary>
+    /// Holds information about a property map.
+    /// </summary>
     public class PropertyMapInfo
     {
+        /// <summary>
+        /// Constructs the property mapper.
+        /// </summary>
+        /// <param name="field">The field being mapped.</param>
+        /// <param name="property">The property being mapped.</param>
         public PropertyMapInfo(string field, PropertyInfo property)
         {
             Field = field;

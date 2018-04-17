@@ -3,6 +3,9 @@ using System.Data.SqlClient;
 
 namespace Carbonated.Data.SqlServer
 {
+    /// <summary>
+    /// Factory that creates data access objects for SQL Server.
+    /// </summary>
     public class SqlServerObjectFactory : DbObjectFactory
     {
         /// <summary>

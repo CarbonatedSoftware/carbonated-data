@@ -6,13 +6,25 @@ using System.Reflection;
 
 namespace Carbonated.Data
 {
+    /// <summary>
+    /// Maps records to entities on a field-to-property basis. Property mappings can be configured using the
+    /// various Map and condition methods.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of entity being mapped.</typeparam>
     public class PropertyMapper<TEntity> : Mapper<TEntity>
     {
         private readonly IList<PropertyMapInfo> mappings;
         private readonly PopulationCondition defaultCondition;
 
+        /// <summary>
+        /// Constructs a Property Mapper with a default condition of Optional.
+        /// </summary>
         public PropertyMapper() : this(PopulationCondition.Optional) { }
 
+        /// <summary>
+        /// Constructs a Property Mapper with the default condition specified.
+        /// </summary>
+        /// <param name="condition">The default population condition to set for properties.</param>
         public PropertyMapper(PopulationCondition condition)
         {
             defaultCondition = condition;
@@ -31,40 +43,133 @@ namespace Carbonated.Data
 
         internal Action<Record, TEntity> AfterBindAction { get; private set; }
 
-        public PropertyMapper<TEntity> Map<P>(Expression<Func<TEntity, P>> property, string field)
+        /// <summary>
+        /// Maps a property to the specified field name. The population condition will be the default for the
+        /// mapper.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> Map<TProperty>(Expression<Func<TEntity, TProperty>> property, string field)
             => MapProp(property, field, defaultCondition, null);
 
-        public PropertyMapper<TEntity> Map<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+        /// <summary>
+        /// Maps a property to the specified field name, with a function that will convert the value as it is
+        /// loaded from the data record. The population condition will be the default for the mapper.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> Map<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
             => MapProp(property, field, defaultCondition, valueConverter);
 
-        public PropertyMapper<TEntity> MapOptional<P>(Expression<Func<TEntity, P>> property, string field) 
+        /// <summary>
+        /// Maps an Optional property to the specified field name
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> MapOptional<TProperty>(Expression<Func<TEntity, TProperty>> property, string field) 
             => MapProp(property, field, PopulationCondition.Optional, null);
 
-        public PropertyMapper<TEntity> MapOptional<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+        /// <summary>
+        /// Maps an Optional property to the specified field name, with a function that will convert the value
+        /// as it is loaded from the data record.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> MapOptional<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
             => MapProp(property, field, PopulationCondition.Optional, valueConverter);
 
-        public PropertyMapper<TEntity> MapRequired<P>(Expression<Func<TEntity, P>> property, string field) 
+        /// <summary>
+        /// Maps a Required property to the specified field name
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> MapRequired<TProperty>(Expression<Func<TEntity, TProperty>> property, string field) 
             => MapProp(property, field, PopulationCondition.Required, null);
 
-        public PropertyMapper<TEntity> MapRequired<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+        /// <summary>
+        /// Maps a Required property to the specified field name, with a function that will convert the value
+        /// as it is loaded from the data record.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> MapRequired<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
             => MapProp(property, field, PopulationCondition.Required, valueConverter);
 
-        public PropertyMapper<TEntity> MapNotNull<P>(Expression<Func<TEntity, P>> property, string field) 
+        /// <summary>
+        /// Maps a NotNull property to the specified field name
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> MapNotNull<TProperty>(Expression<Func<TEntity, TProperty>> property, string field) 
             => MapProp(property, field, PopulationCondition.NotNull, null);
 
-        public PropertyMapper<TEntity> MapNotNull<P>(Expression<Func<TEntity, P>> property, string field, Func<object, object> valueConverter)
+        /// <summary>
+        /// Maps a NotNull property to the specified field name, with a function that will convert the value
+        /// as it is loaded from the data record.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <param name="field">The field name to load data from.</param>
+        /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> MapNotNull<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
             => MapProp(property, field, PopulationCondition.NotNull, valueConverter);
 
-        public PropertyMapper<TEntity> Optional<P>(Expression<Func<TEntity, P>> property) 
+        /// <summary>
+        /// Marks a property's population condition as Optional. This will override the default condition set
+        /// for the mapper in the constructor.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> Optional<TProperty>(Expression<Func<TEntity, TProperty>> property) 
             => SetCondition(property, PopulationCondition.Optional);
 
-        public PropertyMapper<TEntity> Required<P>(Expression<Func<TEntity, P>> property) 
+        /// <summary>
+        /// Marks a property's population condition as Required. This will override the default condition set
+        /// for the mapper in the constructor.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> Required<TProperty>(Expression<Func<TEntity, TProperty>> property) 
             => SetCondition(property, PopulationCondition.Required);
 
-        public PropertyMapper<TEntity> NotNull<P>(Expression<Func<TEntity, P>> property) 
+        /// <summary>
+        /// Marks a property's population condition as NotNull. This will override the default condition set
+        /// for the mapper in the constructor.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> NotNull<TProperty>(Expression<Func<TEntity, TProperty>> property) 
             => SetCondition(property, PopulationCondition.NotNull);
 
-        public PropertyMapper<TEntity> Ignore<P>(Expression<Func<TEntity, P>> property)
+        /// <summary>
+        /// Marks a property to be ignored. Ignored properties will not have any data loaded for them, even if
+        /// there is a matching field available in the data source.
+        /// </summary>
+        /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+        /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+        /// <returns>The property mapper.</returns>
+        public PropertyMapper<TEntity> Ignore<TProperty>(Expression<Func<TEntity, TProperty>> property)
         {
             var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
             var existing = mappings.SingleOrDefault(m => m.Property.Name == prop.Name);
@@ -79,13 +184,20 @@ namespace Carbonated.Data
             return this;
         }
 
+        /// <summary>
+        /// Sets an action that will execute after an entity has had its properties populated. The action is
+        /// passed both the data record and the newly loaded entity, so that it can perform whatever
+        /// additional logic is needed.
+        /// </summary>
+        /// <param name="action">The action to execute.</param>
+        /// <returns>The property mapper.</returns>
         public PropertyMapper<TEntity> AfterBinding(Action<Record, TEntity> action)
         {
             AfterBindAction = action;
             return this;
         }
 
-        private PropertyMapper<TEntity> MapProp<P>(Expression<Func<TEntity, P>> property, string field, PopulationCondition condition, Func<object, object> valueConverter)
+        private PropertyMapper<TEntity> MapProp<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, PopulationCondition condition, Func<object, object> valueConverter)
         {
             var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
             if (PropertyIsMappedToDifferentField(field, prop))
@@ -126,6 +238,11 @@ namespace Carbonated.Data
             }
         }
 
+        /// <summary>
+        /// Creates and populates instance of an entity from a record.
+        /// </summary>
+        /// <param name="record">The record to create an instance from.</param>
+        /// <returns>The newly created and populate instance.</returns>
         protected internal override TEntity CreateInstance(Record record)
         {
             var instance = Activator.CreateInstance<TEntity>();
