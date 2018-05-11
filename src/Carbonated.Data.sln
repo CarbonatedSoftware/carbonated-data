@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data", "Carbonated.Data\Carbonated.Data.csproj", "{C2388420-1E9E-46A8-95AB-8ABBD33BCF05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Carbonated.Data", "Carbonated.Data\Carbonated.Data.csproj", "{C2388420-1E9E-46A8-95AB-8ABBD33BCF05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data.Tests", "Carbonated.Data.Tests\Carbonated.Data.Tests.csproj", "{44F1843E-9925-4498-8542-70EEC9F4194F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Carbonated.Data.Tests", "Carbonated.Data.Tests\Carbonated.Data.Tests.csproj", "{44F1843E-9925-4498-8542-70EEC9F4194F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data.SqlServer", "Carbonated.Data.SqlServer\Carbonated.Data.SqlServer.csproj", "{E61365DF-790F-463C-ACEB-43EDC671FBB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Carbonated.Data.SqlServer", "Carbonated.Data.SqlServer\Carbonated.Data.SqlServer.csproj", "{E61365DF-790F-463C-ACEB-43EDC671FBB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbonated.Data.SqlServer.Tests", "Carbonated.Data.SqlServer.Tests\Carbonated.Data.SqlServer.Tests.csproj", "{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Carbonated.Data.SqlServer.Tests", "Carbonated.Data.SqlServer.Tests\Carbonated.Data.SqlServer.Tests.csproj", "{7EC3E4BA-E2CD-4DB6-A013-7C665BBC613B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

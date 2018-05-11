@@ -263,7 +263,7 @@ namespace Carbonated.Data
 
                 if (mapping.ValueConverter != null)
                 {
-                    prop.SetValue(instance, mapping.ValueConverter(value));
+                    prop.SetValue(instance, mapping.ValueConverter(value), null);
                 }
                 else
                 {
@@ -277,30 +277,30 @@ namespace Carbonated.Data
 
                     if (value == null || value is DBNull)
                     {
-                        prop.SetValue(instance, null);
+                        prop.SetValue(instance, null, null);
                     }
                     else if (propertyType.IsEnum)
                     {
-                        prop.SetValue(instance, ConvertEnum(value, propertyType));
+                        prop.SetValue(instance, ConvertEnum(value, propertyType), null);
                     }
                     else if (propertyType == typeof(Guid))
                     {
-                        prop.SetValue(instance, ConvertGuid(value));
+                        prop.SetValue(instance, ConvertGuid(value), null);
                     }
                     else if (propertyType == typeof(char) && value.ToString() == string.Empty)
                     {
                         // Empty char columns are possible in a database, but converting them
                         // to the char type will fail, so we need to check for them and set
                         // the value to null so that default will be set.
-                        prop.SetValue(instance, null);
+                        prop.SetValue(instance, null, null);
                     }
                     else if (!isNullable && IsComplex(propertyType) && IsPossiblyJson(value))
                     {
-                        prop.SetValue(instance, DeserializeJson(value, prop.PropertyType));
+                        prop.SetValue(instance, DeserializeJson(value, prop.PropertyType), null);
                     }
                     else
                     {
-                        prop.SetValue(instance, Convert.ChangeType(value, propertyType));
+                        prop.SetValue(instance, Convert.ChangeType(value, propertyType), null);
                     }
                 }
             }
