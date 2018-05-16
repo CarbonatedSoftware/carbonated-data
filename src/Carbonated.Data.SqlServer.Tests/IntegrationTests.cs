@@ -124,6 +124,7 @@ namespace Carbonated.Data.SqlServer.Tests
 
             // Load the table and add a row
             var cities = connector.QueryTable("select * from cities");
+            cities.TableName = "cities";
 
             var row = cities.NewRow();
             row["id"] = 13;
@@ -136,6 +137,7 @@ namespace Carbonated.Data.SqlServer.Tests
 
             // Verify that the row was added
             var flCities = connector.QueryTable("select * from cities where state = 'FL'");
+            flCities.TableName = "cities";
             Assert.AreEqual(1, flCities.Rows.Count);
 
             // Restore test data state to starting point

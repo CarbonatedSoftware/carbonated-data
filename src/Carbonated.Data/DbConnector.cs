@@ -207,7 +207,9 @@ namespace Carbonated.Data
             //TODO: We need to make sure that this converts framework value types in the same
             // way that the built-ins do for the entity mappers.
 
-            return (TResult)Convert.ChangeType(QueryScalar(sql, parameters), typeof(TResult));
+            object value = QueryScalar(sql, parameters);
+            return ValueHelper.GetValue<TResult>(value);
+            //return (TResult)Convert.ChangeType(value, typeof(TResult));
         }
 
         /// <summary>
