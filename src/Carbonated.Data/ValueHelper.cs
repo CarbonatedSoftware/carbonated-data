@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Carbonated.Data
 {
@@ -8,36 +6,56 @@ namespace Carbonated.Data
     {
         internal static T GetValue<T>(object value)
         {
-            if (typeof(T) == typeof(Guid))
-            {
-                return GetGuid<T>(value);
-            }
-
-            if (typeof(T)==typeof(char))
-            {
-                if (value is char c)
-                    return (T)value;
-
-                if (value is string str && !string.IsNullOrEmpty(str))
-                    return (T)(object)str[0];
-
-                return default(T);
-            }
-
-            return value == DBNull.Value || value == null 
-                ? default(T) 
-                : (T)Convert.ChangeType(value, typeof(T));
+            return (T)(GetValue(value, typeof(T)) ?? default(T));
         }
 
-        private static T GetGuid<T>(object value)
+        private static object GetValue(object value, Type type)
         {
-            if (value is Guid guid)
-                return (T)value;
+            type = GetUnderlyingType(type);
 
-            if (value is string str && !string.IsNullOrEmpty(str))
-                return (T)(object)Guid.Parse(str);
+            if (value == null || value is DBNull)
+            {
+                return null;
+            }
+            else  if (type == typeof(Guid))
+            {
+                return ConvertGuid(value);
+            }
+            else if (type == typeof(char))
+            {
+                return ConvertChar(value);
+            }
+            else
+            {
+                return Convert.ChangeType(value, type);
+            }
+        }
 
-            return default(T);
+        private static Type GetUnderlyingType(Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
+                ? Nullable.GetUnderlyingType(type)
+                : type;
+        }
+
+        private static object ConvertGuid(object value)
+        {
+            if (value is Guid)
+            {
+                return value;
+            }
+            string str = value.ToString();
+            return !string.IsNullOrEmpty(str) ? Guid.Parse(str) : (object)null;
+        }
+
+        private static object ConvertChar(object value)
+        {
+            if (value is char)
+            {
+                return value;
+            }
+            string str = value.ToString();
+            return !string.IsNullOrEmpty(str) ? str[0] : (object)null;
         }
     }
 }
