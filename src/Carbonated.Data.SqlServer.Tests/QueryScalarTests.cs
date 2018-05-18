@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
 namespace Carbonated.Data.SqlServer.Tests
@@ -132,6 +130,22 @@ namespace Carbonated.Data.SqlServer.Tests
         }
 
         [Test]
+        public void QueryScalarIntEnum()
+        {
+            Assert.AreEqual(Numbers.Zero, db.QueryScalar<Numbers>(Select("int_enum", 1)));
+            Assert.AreEqual(Numbers.Zero, db.QueryScalar<Numbers>(Select("int_enum", 2)));
+            Assert.AreEqual(Numbers.Three, db.QueryScalar<Numbers>(Select("int_enum", 3)));
+        }
+
+        [Test]
+        public void QueryScalarStringEnum()
+        {
+            Assert.AreEqual(Colors.Red, db.QueryScalar<Colors>(Select("string_enum", 1)));
+            Assert.AreEqual(Colors.Red, db.QueryScalar<Colors>(Select("string_enum", 2)));
+            Assert.AreEqual(Colors.Green, db.QueryScalar<Colors>(Select("string_enum", 3)));
+        }
+
+        [Test]
         public void QueryScalarNullableBool()
         {
             Assert.IsNull(db.QueryScalar<bool?>(Select("bool", 1)));
@@ -227,5 +241,20 @@ namespace Carbonated.Data.SqlServer.Tests
             Assert.AreEqual('c', db.QueryScalar<char?>(Select("char", 3)));
         }
 
+        [Test]
+        public void QueryScalarNullableIntEnum()
+        {
+            Assert.AreEqual(null, db.QueryScalar<Numbers?>(Select("int_enum", 1)));
+            Assert.AreEqual(Numbers.Zero, db.QueryScalar<Numbers?>(Select("int_enum", 2)));
+            Assert.AreEqual(Numbers.Three, db.QueryScalar<Numbers?>(Select("int_enum", 3)));
+        }
+
+        [Test]
+        public void QueryScalarNullableStringEnum()
+        {
+            Assert.AreEqual(null, db.QueryScalar<Colors?>(Select("string_enum", 1)));
+            Assert.AreEqual(null, db.QueryScalar<Colors?>(Select("string_enum", 2)));
+            Assert.AreEqual(Colors.Green, db.QueryScalar<Colors?>(Select("string_enum", 3)));
+        }
     }
 }

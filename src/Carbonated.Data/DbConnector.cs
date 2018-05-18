@@ -202,15 +202,8 @@ namespace Carbonated.Data
         /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
         /// <param name="parameters">Parameters for the script, if any.</param>
         /// <returns>The scalar result.</returns>
-        public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null)
-        {
-            //TODO: We need to make sure that this converts framework value types in the same
-            // way that the built-ins do for the entity mappers.
-
-            object value = QueryScalar(sql, parameters);
-            return ValueHelper.GetValue<TResult>(value);
-            //return (TResult)Convert.ChangeType(value, typeof(TResult));
-        }
+        public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null) 
+            => ValueConverter.ToType<TResult>(QueryScalar(sql, parameters));
 
         /// <summary>
         /// Executes a SQL query and returns the first row, first column of the result as an object.

@@ -267,102 +267,12 @@ namespace Carbonated.Data
                 }
                 else
                 {
-                    Type propertyType = prop.PropertyType;
-                    bool isNullable = IsNullable(propertyType);
-                    if (isNullable)
-                    {
-                        // If we have a nullable type, extract it so that our type comparisons below work.
-                        propertyType = Nullable.GetUnderlyingType(propertyType);
-                    }
-
-                    if (value == null || value is DBNull)
-                    {
-                        prop.SetValue(instance, null, null);
-                    }
-                    else if (propertyType.IsEnum)
-                    {
-                        prop.SetValue(instance, ConvertEnum(value, propertyType), null);
-                    }
-                    else if (propertyType == typeof(Guid))
-                    {
-                        prop.SetValue(instance, ConvertGuid(value), null);
-                    }
-                    else if (propertyType == typeof(char) && value.ToString() == string.Empty)
-                    {
-                        // Empty char columns are possible in a database, but converting them
-                        // to the char type will fail, so we need to check for them and set
-                        // the value to null so that default will be set.
-                        prop.SetValue(instance, null, null);
-                    }
-                    else if (!isNullable && IsComplex(propertyType) && IsPossiblyJson(value))
-                    {
-                        prop.SetValue(instance, DeserializeJson(value, prop.PropertyType), null);
-                    }
-                    else
-                    {
-                        prop.SetValue(instance, Convert.ChangeType(value, propertyType), null);
-                    }
+                    prop.SetValue(instance, ValueConverter.ToType(value, prop.PropertyType), null);
                 }
             }
             AfterBindAction?.Invoke(record, instance);
 
             return instance;
         }
-
-        private bool IsNullable(Type type) 
-            => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-
-        private bool IsComplex(Type type)
-        {
-            return !(type.IsPrimitive 
-                || type == typeof(DateTime) 
-                || type == typeof(decimal) 
-                || type == typeof(Guid) 
-                || type == typeof(string));
-        }
-
-        private object ConvertEnum(object value, Type propertyType)
-        {
-            if (Enum.IsDefined(propertyType, value))
-            {
-                return Enum.Parse(propertyType, value.ToString(), true);
-            }
-            if (value is string str && str == string.Empty)
-            {
-                return null;
-            }
-            throw new BindingException($"Value could not be parsed as {propertyType.Name}: {value}");
-        }
-
-        private object ConvertGuid(object value)
-        {
-            // Empty string should be treated as nulls.
-            if (value.ToString() == string.Empty)
-            {
-                return null;
-            }
-
-            if (Guid.TryParse(value.ToString(), out Guid guid))
-            {
-                return guid;
-            }
-
-            throw new BindingException($"Value could not be parsed as {typeof(Guid).Name}: {value}");
-        }
-
-        private bool IsPossiblyJson(object value)
-        {
-            if (!(value is string))
-            {
-                return false;
-            }
-            string str = value.ToString().Trim();
-            return string.IsNullOrWhiteSpace(str)
-                || (str.StartsWith("{") && str.EndsWith("}"))
-                || (str.StartsWith("[") && str.EndsWith("]"));
-        }
-
-        private object DeserializeJson(object value, Type propertyType) 
-            => Newtonsoft.Json.JsonConvert.DeserializeObject(value.ToString(), propertyType);
     }
 }
