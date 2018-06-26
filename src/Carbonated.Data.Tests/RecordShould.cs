@@ -100,5 +100,19 @@ namespace Carbonated.Data.Tests
             Assert.AreEqual(0, record.GetDecimalOrDefault("dec2"));
             Assert.AreEqual(0, record.GetDecimalOrDefault("missing"));
         }
+
+        [Test]
+        public void GetTypeOrFallbackByName()
+        {
+            var record = Record(("int1", 42), ("int2", DBNull.Value));
+
+            Assert.AreEqual(42, record.GetInt32OrDefault("int1"));
+
+            Assert.AreEqual(0, record.GetInt32OrDefault("int2"));
+            Assert.AreEqual(76, record.GetInt32OrDefault("int2", 76));
+
+            Assert.AreEqual(0, record.GetInt32OrDefault("missing"));
+            Assert.AreEqual(99, record.GetInt32OrDefault("missing", 99));
+        }
     }
 }

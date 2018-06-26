@@ -33,7 +33,7 @@ namespace Carbonated.Data
                 // the value to null so that default will be set.
                 return null;
             }
-            else if (!isNullable && IsComplex(type)&&IsPossiblyJson(value))
+            else if (!isNullable && IsComplex(type) && IsPossiblyJson(value))
             {
                 return DeserializeJson(value, type);
             }

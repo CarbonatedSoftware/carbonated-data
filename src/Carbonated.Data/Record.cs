@@ -205,12 +205,30 @@ namespace Carbonated.Data
         public bool GetBooleanOrDefault(string name) => GetValueOrDefault(dataReader.GetBoolean, name);
 
         /// <summary>
+        /// Gets the value of the specified column as a Boolean. If the column is null, the type default will
+        /// be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public bool GetBooleanOrDefault(string name, bool fallback) => GetValueOrDefault(dataReader.GetBoolean, name, fallback);
+
+        /// <summary>
         /// Gets the 8-bit unsigned integer value of the specified column. If the column is null, the type
         /// default will be returned instead.
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The value of the column.</returns>
         public byte GetByteOrDefault(string name) => GetValueOrDefault(dataReader.GetByte, name);
+
+        /// <summary>
+        /// Gets the 8-bit unsigned integer value of the specified column. If the column is null, the type
+        /// default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public byte GetByteOrDefault(string name, byte fallback) => GetValueOrDefault(dataReader.GetByte, name, fallback);
 
         /// <summary>
         /// Gets the character value of the specified column. If the column is null, the type default will be
@@ -221,12 +239,30 @@ namespace Carbonated.Data
         public char GetCharOrDefault(string name) => GetValueOrDefault(dataReader.GetChar, name);
 
         /// <summary>
+        /// Gets the character value of the specified column. If the column is null, the type default will be
+        /// returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public char GetCharOrDefault(string name, char fallback) => GetValueOrDefault(dataReader.GetChar, name, fallback);
+
+        /// <summary>
         /// Gets the date and time data value of the specified field. If the column is null, the type default
         /// will be returned instead.
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The value of the column.</returns>
         public DateTime GetDateTimeOrDefault(string name) => GetValueOrDefault(dataReader.GetDateTime, name);
+
+        /// <summary>
+        /// Gets the date and time data value of the specified field. If the column is null, the type default
+        /// will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public DateTime GetDateTimeOrDefault(string name, DateTime fallback) => GetValueOrDefault(dataReader.GetDateTime, name, fallback);
 
         /// <summary>
         /// Gets the fixed-position numeric value of the specified field. If the column is null, the type
@@ -237,12 +273,30 @@ namespace Carbonated.Data
         public decimal GetDecimalOrDefault(string name) => GetValueOrDefault(dataReader.GetDecimal, name);
 
         /// <summary>
+        /// Gets the fixed-position numeric value of the specified field. If the column is null, the type
+        /// default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public decimal GetDecimalOrDefault(string name, decimal fallback) => GetValueOrDefault(dataReader.GetDecimal, name, fallback);
+
+        /// <summary>
         /// Gets the double-precision floating point number of the specified field. If the column is null, the
         /// type default will be returned instead.
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The value of the column.</returns>
         public double GetDoubleOrDefault(string name) => GetValueOrDefault(dataReader.GetDouble, name);
+
+        /// <summary>
+        /// Gets the double-precision floating point number of the specified field. If the column is null, the
+        /// type default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public double GetDoubleOrDefault(string name, double fallback) => GetValueOrDefault(dataReader.GetDouble, name, fallback);
 
         /// <summary>
         /// Gets the single-precision floating point number of the specified field. If the column is null,
@@ -253,12 +307,30 @@ namespace Carbonated.Data
         public float GetFloatOrDefault(string name) => GetValueOrDefault(dataReader.GetFloat, name);
 
         /// <summary>
+        /// Gets the single-precision floating point number of the specified field. If the column is null,
+        /// the type default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public float GetFloatOrDefault(string name, float fallback) => GetValueOrDefault(dataReader.GetFloat, name, fallback);
+
+        /// <summary>
         /// Returns the GUID value of the specified field. If the column is null, the type default will be
         /// returned instead.
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The value of the column.</returns>
         public Guid GetGuidOrDefault(string name) => GetValueOrDefault(dataReader.GetGuid, name);
+
+        /// <summary>
+        /// Returns the GUID value of the specified field. If the column is null, the type default will be
+        /// returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public Guid GetGuidOrDefault(string name, Guid fallback) => GetValueOrDefault(dataReader.GetGuid, name, fallback);
 
         /// <summary>
         /// Gets the 16-bit signed integer value of the specified field. If the column is null, the type
@@ -269,12 +341,30 @@ namespace Carbonated.Data
         public short GetInt16OrDefault(string name) => GetValueOrDefault(dataReader.GetInt16, name);
 
         /// <summary>
+        /// Gets the 16-bit signed integer value of the specified field. If the column is null, the type
+        /// default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public short GetInt16OrDefault(string name, short fallback) => GetValueOrDefault(dataReader.GetInt16, name, fallback);
+
+        /// <summary>
         /// Gets the 32-bit signed integer value of the specified field. If the column is null, the type
         /// default will be returned instead.
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The value of the column.</returns>
         public int GetInt32OrDefault(string name) => GetValueOrDefault(dataReader.GetInt32, name);
+
+        /// <summary>
+        /// Gets the 32-bit signed integer value of the specified field. If the column is null, the type
+        /// default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public int GetInt32OrDefault(string name, int fallback) => GetValueOrDefault(dataReader.GetInt32, name, fallback);
 
         /// <summary>
         /// Gets the 64-bit signed integer value of the specified field. If the column is null, the type
@@ -285,6 +375,15 @@ namespace Carbonated.Data
         public long GetInt64OrDefault(string name) => GetValueOrDefault(dataReader.GetInt64, name);
 
         /// <summary>
+        /// Gets the 64-bit signed integer value of the specified field. If the column is null, the type
+        /// default will be returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public long GetInt64OrDefault(string name, long fallback) => GetValueOrDefault(dataReader.GetInt64, name, fallback);
+
+        /// <summary>
         /// Gets the string value of the specified field. If the column is null, the type default will be
         /// returned instead.
         /// </summary>
@@ -292,10 +391,19 @@ namespace Carbonated.Data
         /// <returns>The value of the column.</returns>
         public string GetStringOrDefault(string name) => GetValueOrDefault(dataReader.GetString, name);
 
+        /// <summary>
+        /// Gets the string value of the specified field. If the column is null, the type default will be
+        /// returned instead.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <param name="fallback">The fallback value to use by default if the field is missing or null.</param>
+        /// <returns>The value of the column.</returns>
+        public string GetStringOrDefault(string name, string fallback) => GetValueOrDefault(dataReader.GetString, name, fallback);
 
-        private T GetValueOrDefault<T>(Func<int, T> getterFunction, string name)
+
+        private T GetValueOrDefault<T>(Func<int, T> getterFunction, string name, T fallback = default(T))
         {
-            return HasField(name) && !IsDBNull(name) ? getterFunction(GetIndex(name)) : default(T);
+            return HasField(name) && !IsDBNull(name) ? getterFunction(GetIndex(name)) : fallback;
         }
 
         #endregion
