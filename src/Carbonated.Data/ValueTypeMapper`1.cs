@@ -4,7 +4,7 @@ namespace Carbonated.Data
 {
     /// <summary>
     /// Maps and converts the first column of a record to a framework value type using 
-    /// <see cref="ValueConverter.ToType{T}(object)"/>.
+    /// <see cref="Converter.ToType{T}(object)"/>.
     /// </summary>
     /// <typeparam name="T">The type of the value that will be returned. This is expected to be one of the
     /// framework value types, string, or byte[].</typeparam>
@@ -15,6 +15,6 @@ namespace Carbonated.Data
         /// </summary>
         public ValueTypeMapper() : base(ConvertValue) { }
 
-        private static T ConvertValue(IDataRecord record) => ValueConverter.ToType<T>(record.GetValue(0));
+        private static T ConvertValue(IDataRecord record) => Converter.ToType<T>(record.GetValue(0));
     }
 }

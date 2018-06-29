@@ -2,7 +2,7 @@
 
 namespace Carbonated.Data
 {
-    internal class ValueConverter
+    internal class Converter
     {
         internal static T ToType<T>(object value)
         {

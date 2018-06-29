@@ -267,7 +267,7 @@ namespace Carbonated.Data
                 }
                 else
                 {
-                    prop.SetValue(instance, ValueConverter.ToType(value, prop.PropertyType), null);
+                    prop.SetValue(instance, Converter.ToType(value, prop.PropertyType), null);
                 }
             }
             AfterBindAction?.Invoke(record, instance);

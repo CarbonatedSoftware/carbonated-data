@@ -203,7 +203,7 @@ namespace Carbonated.Data
         /// <param name="parameters">Parameters for the script, if any.</param>
         /// <returns>The scalar result.</returns>
         public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null) 
-            => ValueConverter.ToType<TResult>(QueryScalar(sql, parameters));
+            => Converter.ToType<TResult>(QueryScalar(sql, parameters));
 
         /// <summary>
         /// Executes a SQL query and returns the first row, first column of the result as an object.
