@@ -267,12 +267,30 @@ namespace Carbonated.Data
                 }
                 else
                 {
-                    prop.SetValue(instance, Converter.ToType(value, prop.PropertyType), null);
+                    var conv = _converters?.SingleOrDefault(c => c.ValueType == prop.PropertyType);
+                    if (conv != null)
+                    {
+                        prop.SetValue(instance, conv.Convert(value), null);
+                    }
+                    else
+                    {
+                        prop.SetValue(instance, Converter.ToType(value, prop.PropertyType), null);
+                    }
                 }
             }
             AfterBindAction?.Invoke(record, instance);
 
             return instance;
         }
+
+        //---------------------------------------------------
+        //HACK: This is a temporary hack until the full Converter implementation is done and
+        // related code is refactored.
+        protected internal TEntity CreateInstance(Record record, IEnumerable<ValueConverter> converters)
+        {
+            _converters = converters;
+            return CreateInstance(record);
+        }
+        private IEnumerable<ValueConverter> _converters;
     }
 }

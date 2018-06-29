@@ -360,6 +360,21 @@ namespace Carbonated.Data.Tests
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
         }
 
+        [Test]
+        public void UseCustomValueConverterIfAvailableForType()
+        {
+            var cvs = new List<ValueConverter>
+            {
+                new ValueConverter<CustomValueType>(x => new CustomValueType((int)x))
+            };
+            var record = Record(("id", 42), ("custom", 86));
+            var mapper = new PropertyMapper<EntityWithCustomValueType>();
+
+            var inst = mapper.CreateInstance(record, cvs);
+
+            Assert.AreEqual(86, inst.Custom.Value);
+        }
+
         #endregion
 
         #region Test types
@@ -427,6 +442,21 @@ namespace Carbonated.Data.Tests
         {
             public int[] Numbers { get; set; }
             public IEnumerable<string> Strings { get; set; }
+        }
+
+        class CustomValueType
+        {
+            public CustomValueType(int value)
+            {
+                Value = value;
+            }
+            public int Value { get; }
+        }
+
+        class EntityWithCustomValueType
+        {
+            public int Id { get; set; }
+            public CustomValueType Custom { get; set; }
         }
 
         #endregion
