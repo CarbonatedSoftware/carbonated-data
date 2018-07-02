@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Carbonated.Data.Tests.Types;
 using NUnit.Framework;
 using static Carbonated.Data.Tests.SharedMethods;
 
@@ -48,7 +49,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void OverrideDefaultConditionsWithTypeCondition()
         {
-            var mapper = new PropertyMapper<Entity>(PopulationCondition.Required);
+            var mapper = new PropertyMapper<Entity>(null, PopulationCondition.Required);
 
             Assert.IsTrue(mapper.Mappings.All(m => m.Condition == PopulationCondition.Required));
         }
@@ -65,7 +66,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void OverrideTypeConditionWithPropertyConditions()
         {
-            var mapper = new PropertyMapper<Entity>(PopulationCondition.Required)
+            var mapper = new PropertyMapper<Entity>(null, PopulationCondition.Required)
                 .MapNotNull(x => x.Id, "id")
                 .MapOptional(x => x.Name, "name")
                 .Optional(x => x.Title);
@@ -82,7 +83,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void KeepTypeConditionWhenNonConditionalMapIsCalled()
         {
-            var mapper = new PropertyMapper<Entity>(PopulationCondition.Required)
+            var mapper = new PropertyMapper<Entity>(null, PopulationCondition.Required)
                 .Map(x => x.Name, "nom");
 
             Assert.AreEqual(PopulationCondition.Required, mapper.Mappings.Single(m => m.Property.Name == "Name").Condition);
@@ -363,16 +364,16 @@ namespace Carbonated.Data.Tests
         [Test]
         public void UseCustomValueConverterIfAvailableForType()
         {
-            var cvs = new List<ValueConverter>
+            var cvs = new Dictionary<Type, ValueConverter>
             {
-                new ValueConverter<CustomValueType>(x => new CustomValueType((int)x))
+                [typeof(SemanticInt)] = new ValueConverter<SemanticInt>(x => new SemanticInt((int)x))
             };
-            var record = Record(("id", 42), ("custom", 86));
-            var mapper = new PropertyMapper<EntityWithCustomValueType>();
+            var record = Record(("id", 42), ("agentnumber", 86));
+            var mapper = new PropertyMapper<EntityWithSemanticProperty>(cvs);
 
-            var inst = mapper.CreateInstance(record, cvs);
+            var inst = mapper.CreateInstance(record);
 
-            Assert.AreEqual(86, inst.Custom.Value);
+            Assert.AreEqual(86, inst.AgentNumber.Value);
         }
 
         #endregion
@@ -442,21 +443,6 @@ namespace Carbonated.Data.Tests
         {
             public int[] Numbers { get; set; }
             public IEnumerable<string> Strings { get; set; }
-        }
-
-        class CustomValueType
-        {
-            public CustomValueType(int value)
-            {
-                Value = value;
-            }
-            public int Value { get; }
-        }
-
-        class EntityWithCustomValueType
-        {
-            public int Id { get; set; }
-            public CustomValueType Custom { get; set; }
         }
 
         #endregion

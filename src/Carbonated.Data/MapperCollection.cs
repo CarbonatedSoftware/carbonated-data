@@ -11,6 +11,7 @@ namespace Carbonated.Data
     public class MapperCollection
     {
         private readonly List<Mapper> mappers = new List<Mapper>();
+        private readonly IDictionary<Type, ValueConverter> valueConverters = new Dictionary<Type, ValueConverter>();
 
         /// <summary>
         /// Constructs a new mapper collection.
@@ -18,6 +19,17 @@ namespace Carbonated.Data
         public MapperCollection()
         {
             AddFrameworkTypes();
+        }
+
+        /// <summary>
+        /// Adds a value converter to the list of converters that the mapper collection tracks. The converters
+        /// will be used by Property Mappers when populating properties of types in the list.
+        /// </summary>
+        /// <typeparam name="T">The type to add a converter for.</typeparam>
+        /// <param name="conversion">The conversion method, from object to the desired type.</param>
+        public void AddValueConverter<T>(Func<object, T> conversion)
+        {
+            valueConverters.Add(typeof(T), new ValueConverter<T>(conversion));
         }
 
         /// <summary>
@@ -33,7 +45,7 @@ namespace Carbonated.Data
             {
                 throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
             }
-            var mapper = new PropertyMapper<TEntity>();
+            var mapper = new PropertyMapper<TEntity>(valueConverters);
             mappers.Add(mapper);
             return mapper;
         }
@@ -52,7 +64,7 @@ namespace Carbonated.Data
             {
                 throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
             }
-            var mapper = new PropertyMapper<TEntity>(condition);
+            var mapper = new PropertyMapper<TEntity>(valueConverters, condition);
             mappers.Add(mapper);
             return mapper;
         }
@@ -84,7 +96,7 @@ namespace Carbonated.Data
             var mapper = mappers.SingleOrDefault(m => m.EntityType == typeof(TEntity));
             if (mapper == null)
             {
-                mappers.Add(mapper = new PropertyMapper<TEntity>());
+                mappers.Add(mapper = new PropertyMapper<TEntity>(valueConverters));
             }
             return (Mapper<TEntity>)mapper;
         }

@@ -15,18 +15,27 @@ namespace Carbonated.Data
     {
         private readonly IList<PropertyMapInfo> mappings;
         private readonly PopulationCondition defaultCondition;
+        private readonly IDictionary<Type, ValueConverter> valueConverters;
 
         /// <summary>
         /// Constructs a Property Mapper with a default condition of Optional.
         /// </summary>
-        public PropertyMapper() : this(PopulationCondition.Optional) { }
+        public PropertyMapper() : this(null, PopulationCondition.Optional) { }
+
+        /// <summary>
+        /// Constructs a Property Mapper with a default condition of Optional.
+        /// </summary>
+        /// <param name="converters">Dictionary of value converters for custom types.</param>
+        public PropertyMapper(IDictionary<Type, ValueConverter> converters) : this(converters, PopulationCondition.Optional) { }
 
         /// <summary>
         /// Constructs a Property Mapper with the default condition specified.
         /// </summary>
+        /// <param name="converters">Dictionary of value converters for custom types.</param>
         /// <param name="condition">The default population condition to set for properties.</param>
-        public PropertyMapper(PopulationCondition condition)
+        public PropertyMapper(IDictionary<Type, ValueConverter> converters, PopulationCondition condition)
         {
+            valueConverters = converters ?? new Dictionary<Type, ValueConverter>();
             defaultCondition = condition;
             mappings = GenerateDefaultMappings();
 
@@ -267,8 +276,7 @@ namespace Carbonated.Data
                 }
                 else
                 {
-                    var conv = _converters?.SingleOrDefault(c => c.ValueType == prop.PropertyType);
-                    if (conv != null)
+                    if (valueConverters.TryGetValue(prop.PropertyType, out ValueConverter conv))
                     {
                         prop.SetValue(instance, conv.Convert(value), null);
                     }
@@ -282,15 +290,5 @@ namespace Carbonated.Data
 
             return instance;
         }
-
-        //---------------------------------------------------
-        //HACK: This is a temporary hack until the full Converter implementation is done and
-        // related code is refactored.
-        protected internal TEntity CreateInstance(Record record, IEnumerable<ValueConverter> converters)
-        {
-            _converters = converters;
-            return CreateInstance(record);
-        }
-        private IEnumerable<ValueConverter> _converters;
     }
 }

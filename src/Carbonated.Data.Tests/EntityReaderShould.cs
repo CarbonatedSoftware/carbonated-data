@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Carbonated.Data.Tests.Types;
 using NUnit.Framework;
 
 namespace Carbonated.Data.Tests
@@ -36,6 +37,24 @@ namespace Carbonated.Data.Tests
 
             Assert.AreEqual("John Q", items[0].Name);
             Assert.AreEqual("Jane R", items[1].Name);
+        }
+
+        [Test]
+        public void PopulateUsingValueConvertersWhenProvided()
+        {
+            var record = new MockDataRecord(("id", 42), ("agentnumber", 86));
+            var dataReader = new MockDataReader(record);
+
+            var mapperColl = new MapperCollection();
+            mapperColl.AddValueConverter(x => new SemanticInt((int)x));
+
+            var mapper = mapperColl.Get<EntityWithSemanticProperty>();
+
+            var reader = new EntityReader<EntityWithSemanticProperty>(dataReader, mapper);
+            var items = reader.ToList();
+
+            Assert.AreEqual(42, items[0].Id);
+            Assert.AreEqual(86, items[0].AgentNumber.Value);
         }
 
         [Test]

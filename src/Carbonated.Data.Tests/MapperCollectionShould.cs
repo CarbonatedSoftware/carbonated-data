@@ -6,26 +6,26 @@ namespace Carbonated.Data.Tests
     [TestFixture]
     public class MapperCollectionShould
     {
-        private MapperCollection mapperCollection;
+        private MapperCollection mc;
 
         [SetUp]
         public void SetUp()
         {
-            mapperCollection = new MapperCollection();
+            mc = new MapperCollection();
         }
 
         [Test]
         public void AddTypeMapperWhenCreateFuncIsConfigured()
         {
-            mapperCollection.Configure<Entity>(record => new Entity());
+            mc.Configure<Entity>(record => new Entity());
 
-            Assert.IsInstanceOf<TypeMapper<Entity>>(mapperCollection.Get<Entity>());
+            Assert.IsInstanceOf<TypeMapper<Entity>>(mc.Get<Entity>());
         }
 
         [Test]
         public void AddPropertyMapperAndReturnItWhenConfigured()
         {
-            var mapper = mapperCollection.Configure<Entity>();
+            var mapper = mc.Configure<Entity>();
 
             Assert.IsInstanceOf<PropertyMapper<Entity>>(mapper);
         }
@@ -33,7 +33,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void AddPropertyMapperWithDefaultConditionAndReturnItWhenConfigured()
         {
-            var mapper = mapperCollection.Configure<Entity>(PopulationCondition.Required);
+            var mapper = mc.Configure<Entity>(PopulationCondition.Required);
 
             Assert.IsInstanceOf<PropertyMapper<Entity>>(mapper);
         }
@@ -41,58 +41,58 @@ namespace Carbonated.Data.Tests
         [Test]
         public void KnowWhatMappersHaveBeenConfigured()
         {
-            mapperCollection.Configure<Entity>();
+            mc.Configure<Entity>();
 
-            Assert.IsTrue(mapperCollection.HasMapper<Entity>());
+            Assert.IsTrue(mc.HasMapper<Entity>());
         }
 
         [Test]
         public void ThrowOnConfigureIfTypeIsAlreadyRegistered()
         {
-            mapperCollection.Configure<Entity>();
+            mc.Configure<Entity>();
 
-            Assert.Throws<MappingException>(() => mapperCollection.Configure<Entity>());
+            Assert.Throws<MappingException>(() => mc.Configure<Entity>());
         }
 
         [Test]
         public void AutoGenerateAndAddPropertyMapperDuringGetIfNotYetRegistered()
         {
-            Assert.IsFalse(mapperCollection.HasMapper<Entity>());
+            Assert.IsFalse(mc.HasMapper<Entity>());
 
-            var mapper = mapperCollection.Get<Entity>();
+            var mapper = mc.Get<Entity>();
 
-            Assert.IsTrue(mapperCollection.HasMapper<Entity>());
+            Assert.IsTrue(mc.HasMapper<Entity>());
             Assert.IsInstanceOf<PropertyMapper<Entity>>(mapper);
         }
 
         [Test]
         public void HaveFrameworkTypeMappersBuiltIn()
         {
-            Assert.IsTrue(mapperCollection.HasMapper<bool>());
-            Assert.IsTrue(mapperCollection.HasMapper<byte>());
-            Assert.IsTrue(mapperCollection.HasMapper<short>());
-            Assert.IsTrue(mapperCollection.HasMapper<int>());
-            Assert.IsTrue(mapperCollection.HasMapper<long>());
-            Assert.IsTrue(mapperCollection.HasMapper<float>());
-            Assert.IsTrue(mapperCollection.HasMapper<double>());
-            Assert.IsTrue(mapperCollection.HasMapper<decimal>());
-            Assert.IsTrue(mapperCollection.HasMapper<DateTime>());
-            Assert.IsTrue(mapperCollection.HasMapper<Guid>());
-            Assert.IsTrue(mapperCollection.HasMapper<char>());
-            Assert.IsTrue(mapperCollection.HasMapper<string>());
-            Assert.IsTrue(mapperCollection.HasMapper<byte[]>());
+            Assert.IsTrue(mc.HasMapper<bool>());
+            Assert.IsTrue(mc.HasMapper<byte>());
+            Assert.IsTrue(mc.HasMapper<short>());
+            Assert.IsTrue(mc.HasMapper<int>());
+            Assert.IsTrue(mc.HasMapper<long>());
+            Assert.IsTrue(mc.HasMapper<float>());
+            Assert.IsTrue(mc.HasMapper<double>());
+            Assert.IsTrue(mc.HasMapper<decimal>());
+            Assert.IsTrue(mc.HasMapper<DateTime>());
+            Assert.IsTrue(mc.HasMapper<Guid>());
+            Assert.IsTrue(mc.HasMapper<char>());
+            Assert.IsTrue(mc.HasMapper<string>());
+            Assert.IsTrue(mc.HasMapper<byte[]>());
 
-            Assert.IsTrue(mapperCollection.HasMapper<bool?>());
-            Assert.IsTrue(mapperCollection.HasMapper<byte?>());
-            Assert.IsTrue(mapperCollection.HasMapper<short?>());
-            Assert.IsTrue(mapperCollection.HasMapper<int?>());
-            Assert.IsTrue(mapperCollection.HasMapper<long?>());
-            Assert.IsTrue(mapperCollection.HasMapper<float?>());
-            Assert.IsTrue(mapperCollection.HasMapper<double?>());
-            Assert.IsTrue(mapperCollection.HasMapper<decimal?>());
-            Assert.IsTrue(mapperCollection.HasMapper<DateTime?>());
-            Assert.IsTrue(mapperCollection.HasMapper<Guid?>());
-            Assert.IsTrue(mapperCollection.HasMapper<char?>());
+            Assert.IsTrue(mc.HasMapper<bool?>());
+            Assert.IsTrue(mc.HasMapper<byte?>());
+            Assert.IsTrue(mc.HasMapper<short?>());
+            Assert.IsTrue(mc.HasMapper<int?>());
+            Assert.IsTrue(mc.HasMapper<long?>());
+            Assert.IsTrue(mc.HasMapper<float?>());
+            Assert.IsTrue(mc.HasMapper<double?>());
+            Assert.IsTrue(mc.HasMapper<decimal?>());
+            Assert.IsTrue(mc.HasMapper<DateTime?>());
+            Assert.IsTrue(mc.HasMapper<Guid?>());
+            Assert.IsTrue(mc.HasMapper<char?>());
         }
     }
 }
