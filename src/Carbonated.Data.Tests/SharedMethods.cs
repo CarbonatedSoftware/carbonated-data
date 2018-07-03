@@ -1,4 +1,7 @@
-﻿namespace Carbonated.Data.Tests
+﻿using System;
+using System.Collections.Generic;
+
+namespace Carbonated.Data.Tests
 {
     public static class SharedMethods
     {
@@ -10,5 +13,13 @@
         }
 
         public static string[] Strings(params string[] strings) => strings;
+
+        public static PropertyMapper<T> PropMapper<T>() => new PropertyMapper<T>(null);
+
+        public static PropertyMapper<T> PropMapper<T>(IDictionary<Type, ValueConverter> converters) 
+            => new PropertyMapper<T>(converters);
+
+        public static PropertyMapper<T> PropMapper<T>(PopulationCondition condition) 
+            => new PropertyMapper<T>(null, condition);
     }
 }

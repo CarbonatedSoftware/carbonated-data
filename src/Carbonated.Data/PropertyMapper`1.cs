@@ -20,11 +20,6 @@ namespace Carbonated.Data
         /// <summary>
         /// Constructs a Property Mapper with a default condition of Optional.
         /// </summary>
-        public PropertyMapper() : this(null, PopulationCondition.Optional) { }
-
-        /// <summary>
-        /// Constructs a Property Mapper with a default condition of Optional.
-        /// </summary>
         /// <param name="converters">Dictionary of value converters for custom types.</param>
         public PropertyMapper(IDictionary<Type, ValueConverter> converters) : this(converters, PopulationCondition.Optional) { }
 

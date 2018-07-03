@@ -13,7 +13,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void GenerateDefaultPropertyMappingsForWritableProperties()
         {
-            var mapper = new PropertyMapper<Entity>();
+            var mapper = PropMapper<Entity>();
 
             CollectionAssert.AreEqual(Strings("Id", "Name", "Title"), mapper.Mappings.Select(m => m.Field));
         }
@@ -21,7 +21,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void OverrideDefaultMappingsWithExplicitMappings()
         {
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Map(x => x.Name, "nom");
 
             var fields = mapper.Mappings.Select(m => m.Field);
@@ -32,7 +32,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void ThrowExceptionWhenFieldIsMappedToMoreThanOneProperty()
         {
-            var mapper = new PropertyMapper<Entity>();
+            var mapper = PropMapper<Entity>();
 
             var ex = Assert.Throws<MappingException>(() => mapper.Map(x => x.Name, "Title"));
             StringAssert.StartsWith("Field cannot be mapped to more than one property", ex.Message);
@@ -41,7 +41,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void DefaultGeneratedMappingsToOptional()
         {
-            var mapper = new PropertyMapper<Entity>();
+            var mapper = PropMapper<Entity>();
 
             Assert.IsTrue(mapper.Mappings.All(m => m.Condition == PopulationCondition.Optional));
         }
@@ -49,7 +49,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void OverrideDefaultConditionsWithTypeCondition()
         {
-            var mapper = new PropertyMapper<Entity>(null, PopulationCondition.Required);
+            var mapper = PropMapper<Entity>(PopulationCondition.Required);
 
             Assert.IsTrue(mapper.Mappings.All(m => m.Condition == PopulationCondition.Required));
         }
@@ -57,7 +57,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void MarkPropertyAsIgnoredWhenIgnored()
         {
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Ignore(x => x.Title);
 
             Assert.IsTrue(mapper.Mappings.Single(m => m.Property.Name == "Title").IsIgnored);
@@ -66,7 +66,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void OverrideTypeConditionWithPropertyConditions()
         {
-            var mapper = new PropertyMapper<Entity>(null, PopulationCondition.Required)
+            var mapper = PropMapper<Entity>(PopulationCondition.Required)
                 .MapNotNull(x => x.Id, "id")
                 .MapOptional(x => x.Name, "name")
                 .Optional(x => x.Title);
@@ -83,7 +83,7 @@ namespace Carbonated.Data.Tests
         [Test]
         public void KeepTypeConditionWhenNonConditionalMapIsCalled()
         {
-            var mapper = new PropertyMapper<Entity>(null, PopulationCondition.Required)
+            var mapper = PropMapper<Entity>(PopulationCondition.Required)
                 .Map(x => x.Name, "nom");
 
             Assert.AreEqual(PopulationCondition.Required, mapper.Mappings.Single(m => m.Property.Name == "Name").Condition);
@@ -94,7 +94,7 @@ namespace Carbonated.Data.Tests
         {
             Func<object, object> customConverter = value => int.Parse(value.ToString());
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Map(x => x.Id, "id", customConverter);
 
             Assert.AreSame(customConverter, mapper.Mappings.Single(m => m.Property.Name == "Id").ValueConverter);
@@ -105,7 +105,7 @@ namespace Carbonated.Data.Tests
         {
             Action<Record, Entity> action = (record, entity) => entity.Name = "name";
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .AfterBinding(action);
 
             Assert.AreSame(action, mapper.AfterBindAction);
@@ -118,7 +118,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>();
+            var mapper = PropMapper<Entity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
@@ -129,7 +129,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", 10), ("nom", "John Q"), ("role", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Map(x => x.Name, "nom")
                 .Map(x => x.Title, "role");
             var inst = mapper.CreateInstance(record);
@@ -142,7 +142,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", "ten"), ("name", "John Q"), ("title", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Map(x => x.Id, "id", v => v.ToString() == "ten" ? 10 : 0);
             var inst = mapper.CreateInstance(record);
 
@@ -154,7 +154,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .AfterBinding((r, e) => e.Title = "override");
             var inst = mapper.CreateInstance(record);
 
@@ -166,7 +166,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Ignore(x => x.Title);
             var inst = mapper.CreateInstance(record);
 
@@ -178,7 +178,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", 10), ("name", "John Q"), ("ti_tle", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>();
+            var mapper = PropMapper<Entity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
@@ -189,7 +189,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("EntityId", 50));
 
-            var mapper = new PropertyMapper<NonNormalEntity>();
+            var mapper = PropMapper<NonNormalEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(50, inst.Entity_Id);
@@ -200,7 +200,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("intprop", null), ("dateprop", DBNull.Value));
 
-            var mapper = new PropertyMapper<IntDateEntity>();
+            var mapper = PropMapper<IntDateEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(0, inst.IntProp);
@@ -212,7 +212,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("intprop", null), ("dateprop", DBNull.Value));
 
-            var mapper = new PropertyMapper<NullableIntDateEntity>();
+            var mapper = PropMapper<NullableIntDateEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.IsNull(inst.IntProp);
@@ -224,7 +224,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("color", "Blue"), ("shape", 2), ("othercolor", DBNull.Value), ("othershape", ""));
 
-            var mapper = new PropertyMapper<EnumEntity>();
+            var mapper = PropMapper<EnumEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(EnumEntity.Colors.Blue, inst.Color);
@@ -239,7 +239,7 @@ namespace Carbonated.Data.Tests
             var record1 = Record(("color", "Yellow"));
             var record2 = Record(("shape", 5));
 
-            var mapper = new PropertyMapper<EnumEntity>();
+            var mapper = PropMapper<EnumEntity>();
 
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record1));
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record2));
@@ -250,7 +250,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("foo", null), ("bar", DBNull.Value), ("baz", "10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"));
 
-            var mapper = new PropertyMapper<GuidEntity>();
+            var mapper = PropMapper<GuidEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(Guid.Empty, inst.Foo);
@@ -263,7 +263,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("foo", null), ("bar", string.Empty), ("baz", "10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"));
 
-            var mapper = new PropertyMapper<NullableGuidEntity>();
+            var mapper = PropMapper<NullableGuidEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.IsNull(inst.Foo);
@@ -276,7 +276,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("foo", "bogusguid"));
 
-            var mapper = new PropertyMapper<GuidEntity>();
+            var mapper = PropMapper<GuidEntity>();
 
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
         }
@@ -286,7 +286,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("CharProp", string.Empty));
 
-            var mapper = new PropertyMapper<CharEntity>();
+            var mapper = PropMapper<CharEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(default(char), inst.CharProp);
@@ -297,7 +297,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("intprop", "42"), ("dateprop", "2018-04-02 08:30:01"), ("decimalprop", "3.14"));
 
-            var mapper = new PropertyMapper<ValueEntity>();
+            var mapper = PropMapper<ValueEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(42, inst.IntProp);
@@ -310,7 +310,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("IntDateProp", "{ \"IntProp\" : 5, \"DateProp\" : \"2016-01-01 16:15:00 \" }"));
 
-            var mapper = new PropertyMapper<JsonEntity>();
+            var mapper = PropMapper<JsonEntity>();
             var inst = mapper.CreateInstance(record);
 
             Assert.AreEqual(inst.IntDateProp.IntProp, 5);
@@ -324,7 +324,7 @@ namespace Carbonated.Data.Tests
             var record2 = Record(("numbers", "[]"), ("strings", "[]"));
             var record3 = Record(("numbers", null), ("strings", ""));
 
-            var mapper = new PropertyMapper<JsonArrayEntity>();
+            var mapper = PropMapper<JsonArrayEntity>();
             var inst1 = mapper.CreateInstance(record1);
             var inst2 = mapper.CreateInstance(record2);
             var inst3 = mapper.CreateInstance(record3);
@@ -344,7 +344,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("Id", 10), ("Title", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Required(x => x.Name);
 
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
@@ -355,7 +355,7 @@ namespace Carbonated.Data.Tests
         {
             var record = Record(("id", 10), ("name", null), ("title", "Tester"));
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .NotNull(x => x.Name);
 
             Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
@@ -369,7 +369,7 @@ namespace Carbonated.Data.Tests
                 [typeof(SemanticInt)] = new ValueConverter<SemanticInt>(x => new SemanticInt((int)x))
             };
             var record = Record(("id", 42), ("agentnumber", 86));
-            var mapper = new PropertyMapper<EntityWithSemanticProperty>(cvs);
+            var mapper = PropMapper<EntityWithSemanticProperty>(cvs);
 
             var inst = mapper.CreateInstance(record);
 

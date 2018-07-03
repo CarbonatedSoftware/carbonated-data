@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Carbonated.Data.Tests.Types;
 using NUnit.Framework;
+using static Carbonated.Data.Tests.SharedMethods;
 
 namespace Carbonated.Data.Tests
 {
@@ -28,7 +29,7 @@ namespace Carbonated.Data.Tests
             var record2 = new MockDataRecord(("id", 2), ("n", "Jane R"), ("t", "Supervisor"));
             var dataReader = new MockDataReader(record1, record2);
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Map(x => x.Name, "n")
                 .Map(x => x.Title, "t");
 
@@ -64,7 +65,7 @@ namespace Carbonated.Data.Tests
             var record2 = new MockDataRecord(("id", 2), ("n", "Jane R"), ("t", "Supervisor"));
             var dataReader = new MockDataReader(record1, record2);
 
-            var mapper = new PropertyMapper<Entity>()
+            var mapper = PropMapper<Entity>()
                 .Map(x => x.Name, "n")
                 .Map(x => x.Title, "t");
 
