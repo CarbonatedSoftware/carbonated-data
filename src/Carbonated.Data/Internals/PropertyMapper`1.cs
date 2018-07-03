@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Maps records to entities on a field-to-property basis. Property mappings can be configured using the

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Holds information about a property map.

@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     internal class SaveAdapterMaker
     {

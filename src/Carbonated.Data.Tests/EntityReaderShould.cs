@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Carbonated.Data.Internals;
 using Carbonated.Data.Tests.Types;
 using NUnit.Framework;
 using static Carbonated.Data.Tests.SharedMethods;

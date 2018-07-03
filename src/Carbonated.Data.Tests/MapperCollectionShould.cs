@@ -1,4 +1,5 @@
 ﻿using System;
+using Carbonated.Data.Internals;
 using NUnit.Framework;
 
 namespace Carbonated.Data.Tests

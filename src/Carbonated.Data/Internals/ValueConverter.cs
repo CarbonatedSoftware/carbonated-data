@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Base for value converters.

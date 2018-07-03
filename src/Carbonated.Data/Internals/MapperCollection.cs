@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Manages the collection of entity mappers. The collection is pre-loaded with

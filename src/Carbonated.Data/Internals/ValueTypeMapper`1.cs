@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Maps and converts the first column of a record to a framework value type using 

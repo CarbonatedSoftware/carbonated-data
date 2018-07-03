@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Carbonated.Data.Internals;
 
 namespace Carbonated.Data.Tests
 {

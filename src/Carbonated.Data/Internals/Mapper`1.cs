@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Base class that generic-typed record-to-entity mappers derive from, allowing them

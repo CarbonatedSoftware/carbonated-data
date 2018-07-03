@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Carbonated.Data
+namespace Carbonated.Data.Internals
 {
     /// <summary>
     /// Maps records to entities using a custom creator function.

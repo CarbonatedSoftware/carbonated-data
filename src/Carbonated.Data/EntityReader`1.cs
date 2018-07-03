@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using Carbonated.Data.Internals;
 
 namespace Carbonated.Data
 {
