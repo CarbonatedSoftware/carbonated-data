@@ -33,6 +33,17 @@ namespace Carbonated.Data.Internals
         }
 
         /// <summary>
+        /// Gets a custom value converter if any can be found for the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type to convert.</typeparam>
+        /// <returns>The custom value converter, or null if none is found.</returns>
+        internal ValueConverter GetValueConverter<T>()
+        {
+            valueConverters.TryGetValue(typeof(T), out ValueConverter conv);
+            return conv;
+        }
+
+        /// <summary>
         /// Adds a property mapper for an entity and returns it for configuration. The default population
         /// condition for all properties will be Optional.
         /// </summary>

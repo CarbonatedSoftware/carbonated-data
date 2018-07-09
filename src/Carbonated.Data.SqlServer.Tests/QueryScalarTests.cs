@@ -256,5 +256,21 @@ namespace Carbonated.Data.SqlServer.Tests
             Assert.AreEqual(null, db.QueryScalar<Colors?>(Select("string_enum", 2)));
             Assert.AreEqual(Colors.Green, db.QueryScalar<Colors?>(Select("string_enum", 3)));
         }
+
+        [Test]
+        public void QueryScalarUsingCustomValueConverter()
+        {
+            db.Mappers.AddValueConverter(x => new SemanticInt((int)x));
+
+            var result = db.QueryScalar<SemanticInt>(Select("int", 3));
+
+            Assert.AreEqual(3, result.Value);
+        }
+
+        class SemanticInt
+        {
+            public SemanticInt(int value) { Value = value; }
+            public int Value { get; }
+        }
     }
 }

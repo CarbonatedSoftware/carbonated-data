@@ -203,8 +203,14 @@ namespace Carbonated.Data
         /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
         /// <param name="parameters">Parameters for the script, if any.</param>
         /// <returns>The scalar result.</returns>
-        public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null) 
-            => Converter.ToType<TResult>(QueryScalar(sql, parameters));
+        public TResult QueryScalar<TResult>(string sql, IEnumerable<DbParameter> parameters = null)
+        {
+            object result = QueryScalar(sql, parameters);
+            var conv = Mappers.GetValueConverter<TResult>();
+            return conv != null 
+                ? (TResult)conv.Convert(result) 
+                : Converter.ToType<TResult>(result);
+        }
 
         /// <summary>
         /// Executes a SQL query and returns the first row, first column of the result as an object.
