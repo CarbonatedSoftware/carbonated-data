@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -113,6 +114,13 @@ namespace Carbonated.Data.SqlServer.Tests
             var cities = connector.Query<City>("select id, name as nom from cities where state = 'TX'");
 
             Assert.AreEqual("Houston", cities.First().Name);
+        }
+
+        [Test]
+        public void NullParameterValuesAreConvertedToDbNull()
+        {
+            var p = connector.ObjectFactory.CreateParameter("@test", null);
+            Assert.AreEqual(DBNull.Value, p.Value);
         }
 
         [Test]

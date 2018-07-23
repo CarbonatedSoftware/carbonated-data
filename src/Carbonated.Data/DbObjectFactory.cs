@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -89,7 +90,7 @@ namespace Carbonated.Data
         {
             var p = CreateParameter();
             p.ParameterName = name;
-            p.Value = value;
+            p.Value = value ?? DBNull.Value;
             return p;
         }
 
