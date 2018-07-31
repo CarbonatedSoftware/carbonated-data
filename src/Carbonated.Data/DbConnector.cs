@@ -48,6 +48,11 @@ namespace Carbonated.Data
         public MapperCollection Mappers { get; private set; } = new MapperCollection();
 
         /// <summary>
+        /// The connection string in use by the connector.
+        /// </summary>
+        public string ConnectionString => connectionString;
+
+        /// <summary>
         /// The DbObjectFactory being used by the connector.
         /// </summary>
         public DbObjectFactory ObjectFactory => dbFactory;

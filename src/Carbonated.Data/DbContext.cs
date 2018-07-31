@@ -11,6 +11,11 @@ namespace Carbonated.Data
     public interface DbContext : IDisposable
     {
         /// <summary>
+        /// The connection string in use by the context.
+        /// </summary>
+        string ConnectionString { get; }
+
+        /// <summary>
         /// The engine-specific object factory to create Db objects.
         /// </summary>
         DbObjectFactory ObjectFactory { get; }
