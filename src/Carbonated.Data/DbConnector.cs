@@ -275,6 +275,13 @@ namespace Carbonated.Data
                 using (var cmd = MakeCommand(sql, cn, parameters))
                 using (var adapter = dbFactory.CreateDataAdapter(cmd))
                 {
+                    var set = new DataSet();
+                    set.EnforceConstraints = false;
+                    adapter.FillSchema(set, SchemaType.Source);
+                    adapter.Fill(set);
+
+                    return set.Tables[0];
+
                     var table = new DataTable();
                     adapter.FillSchema(table, SchemaType.Source); // Load schema so that we get key data.
                     adapter.Fill(table);
