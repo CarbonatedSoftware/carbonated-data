@@ -281,11 +281,6 @@ namespace Carbonated.Data
                     adapter.Fill(set);
 
                     return set.Tables[0];
-
-                    var table = new DataTable();
-                    adapter.FillSchema(table, SchemaType.Source); // Load schema so that we get key data.
-                    adapter.Fill(table);
-                    return table;
                 }
             }
             finally

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Carbonated.Data.Internals
 {
@@ -10,7 +10,7 @@ namespace Carbonated.Data.Internals
     /// </summary>
     public class MapperCollection
     {
-        private readonly List<Mapper> mappers = new List<Mapper>();
+        private readonly ConcurrentDictionary<Type, Mapper> mappers = new ConcurrentDictionary<Type, Mapper>();
         private readonly IDictionary<Type, ValueConverter> valueConverters = new Dictionary<Type, ValueConverter>();
 
         /// <summary>
@@ -52,12 +52,11 @@ namespace Carbonated.Data.Internals
         /// <exception cref="MappingException">Throws if a mapper is already configured for the entity.</exception>
         public PropertyMapper<TEntity> Configure<TEntity>()
         {
-            if (HasMapper<TEntity>())
+            var mapper = new PropertyMapper<TEntity>(valueConverters);
+            if (!mappers.TryAdd(typeof(TEntity), mapper))
             {
                 throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
             }
-            var mapper = new PropertyMapper<TEntity>(valueConverters);
-            mappers.Add(mapper);
             return mapper;
         }
 
@@ -71,12 +70,11 @@ namespace Carbonated.Data.Internals
         /// <exception cref="MappingException">Throws if a mapper is already configured for the entity.</exception>
         public PropertyMapper<TEntity> Configure<TEntity>(PopulationCondition condition)
         {
-            if (HasMapper<TEntity>())
+            var mapper = new PropertyMapper<TEntity>(valueConverters, condition);
+            if (!mappers.TryAdd(typeof(TEntity), mapper))
             {
                 throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
             }
-            var mapper = new PropertyMapper<TEntity>(valueConverters, condition);
-            mappers.Add(mapper);
             return mapper;
         }
 
@@ -88,11 +86,10 @@ namespace Carbonated.Data.Internals
         /// <exception cref="MappingException">Throws if a mapper is already configured for the entity.</exception>
         public void Configure<TEntity>(Func<Record, TEntity> creator)
         {
-            if (HasMapper<TEntity>())
+            if (!mappers.TryAdd(typeof(TEntity), new TypeMapper<TEntity>(creator)))
             {
                 throw new MappingException($"A mapper is already configured for type {typeof(TEntity).Name}");
             }
-            mappers.Add(new TypeMapper<TEntity>(creator));
         }
 
         /// <summary>
@@ -104,11 +101,7 @@ namespace Carbonated.Data.Internals
         /// <returns>The entity type's mapper.</returns>
         public Mapper<TEntity> Get<TEntity>()
         {
-            var mapper = mappers.SingleOrDefault(m => m.EntityType == typeof(TEntity));
-            if (mapper == null)
-            {
-                mappers.Add(mapper = new PropertyMapper<TEntity>(valueConverters));
-            }
+            var mapper = mappers.GetOrAdd(typeof(TEntity), _ => new PropertyMapper<TEntity>(valueConverters));
             return (Mapper<TEntity>)mapper;
         }
 
@@ -119,36 +112,36 @@ namespace Carbonated.Data.Internals
         /// <returns>true if a mapper is registered; otherwise, false</returns>
         public bool HasMapper<TEntity>()
         {
-            return mappers.Any(m => m.EntityType == typeof(TEntity));
+            return mappers.ContainsKey(typeof(TEntity));
         }
 
         private void AddFrameworkTypes()
         {
-            mappers.Add(new ValueTypeMapper<bool>());
-            mappers.Add(new ValueTypeMapper<byte>());
-            mappers.Add(new ValueTypeMapper<short>());
-            mappers.Add(new ValueTypeMapper<int>());
-            mappers.Add(new ValueTypeMapper<long>());
-            mappers.Add(new ValueTypeMapper<float>());
-            mappers.Add(new ValueTypeMapper<double>());
-            mappers.Add(new ValueTypeMapper<decimal>());
-            mappers.Add(new ValueTypeMapper<DateTime>());
-            mappers.Add(new ValueTypeMapper<Guid>());
-            mappers.Add(new ValueTypeMapper<char>());
-            mappers.Add(new ValueTypeMapper<string>());
-            mappers.Add(new ValueTypeMapper<byte[]>());
+            mappers.TryAdd(typeof(bool), new ValueTypeMapper<bool>());
+            mappers.TryAdd(typeof(byte), new ValueTypeMapper<byte>());
+            mappers.TryAdd(typeof(short), new ValueTypeMapper<short>());
+            mappers.TryAdd(typeof(int), new ValueTypeMapper<int>());
+            mappers.TryAdd(typeof(long), new ValueTypeMapper<long>());
+            mappers.TryAdd(typeof(float), new ValueTypeMapper<float>());
+            mappers.TryAdd(typeof(double), new ValueTypeMapper<double>());
+            mappers.TryAdd(typeof(decimal), new ValueTypeMapper<decimal>());
+            mappers.TryAdd(typeof(DateTime), new ValueTypeMapper<DateTime>());
+            mappers.TryAdd(typeof(Guid), new ValueTypeMapper<Guid>());
+            mappers.TryAdd(typeof(char), new ValueTypeMapper<char>());
+            mappers.TryAdd(typeof(string), new ValueTypeMapper<string>());
+            mappers.TryAdd(typeof(byte[]), new ValueTypeMapper<byte[]>());
 
-            mappers.Add(new ValueTypeMapper<bool?>());
-            mappers.Add(new ValueTypeMapper<byte?>());
-            mappers.Add(new ValueTypeMapper<short?>());
-            mappers.Add(new ValueTypeMapper<int?>());
-            mappers.Add(new ValueTypeMapper<long?>());
-            mappers.Add(new ValueTypeMapper<float?>());
-            mappers.Add(new ValueTypeMapper<double?>());
-            mappers.Add(new ValueTypeMapper<decimal?>());
-            mappers.Add(new ValueTypeMapper<DateTime?>());
-            mappers.Add(new ValueTypeMapper<Guid?>());
-            mappers.Add(new ValueTypeMapper<char?>());
+            mappers.TryAdd(typeof(bool?), new ValueTypeMapper<bool?>());
+            mappers.TryAdd(typeof(byte?), new ValueTypeMapper<byte?>());
+            mappers.TryAdd(typeof(short?), new ValueTypeMapper<short?>());
+            mappers.TryAdd(typeof(int?), new ValueTypeMapper<int?>());
+            mappers.TryAdd(typeof(long?), new ValueTypeMapper<long?>());
+            mappers.TryAdd(typeof(float?), new ValueTypeMapper<float?>());
+            mappers.TryAdd(typeof(double?), new ValueTypeMapper<double?>());
+            mappers.TryAdd(typeof(decimal?), new ValueTypeMapper<decimal?>());
+            mappers.TryAdd(typeof(DateTime?), new ValueTypeMapper<DateTime?>());
+            mappers.TryAdd(typeof(Guid?), new ValueTypeMapper<Guid?>());
+            mappers.TryAdd(typeof(char?), new ValueTypeMapper<char?>());
         }
     }
 }
