@@ -12,8 +12,7 @@ namespace Carbonated.Data
     /// </summary>
     public class DbConnector : DbContext
     {
-        private readonly string connectionString;
-        private readonly int commandTimeout;
+        private readonly DbConnectorOptions options;
         private readonly bool isContext;
         private DbObjectFactory dbFactory;
         private DbConnection contextConnection;
@@ -25,20 +24,29 @@ namespace Carbonated.Data
         /// <param name="connectionString">The connection string to use for queries.</param>
         /// <param name="commandTimeout">The default command timeout for commands.</param>
         public DbConnector(DbObjectFactory objectFactory, string connectionString, int commandTimeout = 300)
+            : this(objectFactory, new DbConnectorOptions() { ConnectionString = connectionString, CommandTimeout = commandTimeout })
+        {
+        }
+
+        /// <summary>
+        /// Constructs a DbConnector.
+        /// </summary>
+        /// <param name="objectFactory">The engine-specific object factory to use.</param>
+        /// <param name="options">The options to use for queries and connector behavior.</param>
+        public DbConnector(DbObjectFactory objectFactory, DbConnectorOptions options)
         {
             dbFactory = objectFactory;
-            this.connectionString = connectionString;
-            this.commandTimeout = commandTimeout;
+            this.options = options;
         }
 
         /// <summary>
         /// Internal constructor used by the OpenContext call.
         /// </summary>
-        internal DbConnector(DbObjectFactory objectFactory, DbConnection connection, int commandTimeout)
+        internal DbConnector(DbObjectFactory objectFactory, DbConnection connection, DbConnectorOptions options)
         {
             dbFactory = objectFactory;
             contextConnection = connection;
-            this.commandTimeout = commandTimeout;
+            this.options = options;
             isContext = true;
         }
 
@@ -50,7 +58,7 @@ namespace Carbonated.Data
         /// <summary>
         /// The connection string in use by the connector.
         /// </summary>
-        public string ConnectionString => connectionString;
+        public string ConnectionString => options.ConnectionString;
 
         /// <summary>
         /// The DbObjectFactory being used by the connector.
@@ -67,8 +75,8 @@ namespace Carbonated.Data
         /// <returns>A disposable data context with an open connection.</returns>
         public DbContext OpenContext()
         {
-            var cn = dbFactory.OpenConnection(connectionString);
-            return new DbConnector(dbFactory, cn, commandTimeout);
+            var cn = dbFactory.OpenConnection(options.ConnectionString);
+            return new DbConnector(dbFactory, cn, options);
         }
 
         /// <summary>
@@ -105,7 +113,7 @@ namespace Carbonated.Data
         /// <returns>The number of rows affected.</returns>
         public int NonQuery(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(options.ConnectionString);
             try
             {
                 using (var cmd = MakeCommand(sql, cn, parameters))
@@ -181,7 +189,7 @@ namespace Carbonated.Data
         /// <returns>A DbDataReader</returns>
         public DbDataReader QueryReader(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(options.ConnectionString);
             using (var cmd = MakeCommand(sql, cn, parameters))
             {
                 // Set the behavior to close the connection when the reader is disposed if
@@ -234,7 +242,7 @@ namespace Carbonated.Data
         /// <returns>The scalar result.</returns>
         public object QueryScalar(string sql, IEnumerable<DbParameter> parameters = null)
         {
-            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(options.ConnectionString);
             try
             {
                 using (var cmd = MakeCommand(sql, cn, parameters))
@@ -269,14 +277,14 @@ namespace Carbonated.Data
         /// <returns>The data table result.</returns>
         public DataTable QueryTable(string sql, IEnumerable<DbParameter> parameters)
         {
-            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(options.ConnectionString);
             try
             {
                 using (var cmd = MakeCommand(sql, cn, parameters))
                 using (var adapter = dbFactory.CreateDataAdapter(cmd))
                 {
                     var set = new DataSet();
-                    set.EnforceConstraints = false;
+                    set.EnforceConstraints = options.EnforceConstraintsOnQueryTable;
                     adapter.FillSchema(set, SchemaType.Source);
                     adapter.Fill(set);
 
@@ -306,10 +314,10 @@ namespace Carbonated.Data
                 throw new Exception($"Table cannot be saved without primary key: {table.TableName}");
             }
 
-            var cn = isContext ? contextConnection : dbFactory.OpenConnection(connectionString);
+            var cn = isContext ? contextConnection : dbFactory.OpenConnection(options.ConnectionString);
             try
             {
-                var sam = new SaveAdapterMaker(dbFactory, commandTimeout);
+                var sam = new SaveAdapterMaker(dbFactory, options.CommandTimeout);
                 using (var adapter = sam.MakeAdapter(table, cn))
                 {
                     return adapter.Update(table);
@@ -330,7 +338,7 @@ namespace Carbonated.Data
         /// </summary>
         private DbCommand MakeCommand(string sql, DbConnection connection, IEnumerable<DbParameter> parameters)
         {
-            var cmd = dbFactory.CreateCommand(sql, connection, commandTimeout);
+            var cmd = dbFactory.CreateCommand(sql, connection, options.CommandTimeout);
             if (parameters?.Count() > 0)
             {
                 cmd.Parameters.AddRange(parameters.ToArray());
