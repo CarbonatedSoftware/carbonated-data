@@ -85,23 +85,31 @@ var colors = connector.Query<Color>("GetColorsByType", ("@colorType", "secondary
 
 ### QueryReader\<TEntity>(sql, parameters)
 
+Executes a query and returns an `EntityReader<TEntity>` that can be used to read the results as `TEntity` in sequence.
+
 ...
 
 --------
 
 ### QueryReader(sql, parameters)
 
+Executes a query and returns a `DbDataReader` of the results. The results will not be automatically converted to an entity as they are read.
+
 ...
 
 --------
 
-### QueryScalar<TEntity>(sql, parameters)
+### QueryScalar\<TEntity>(sql, parameters)
+
+Executes a query and returns a single result of type `TEntity`.
 
 ...
 
 --------
 
 ### QueryScalar(sql, parameters)
+
+Executes a query and returns a single result as an `object`.
 
 ...
 
@@ -110,8 +118,8 @@ var colors = connector.Query<Color>("GetColorsByType", ("@colorType", "secondary
 ### QueryTable(sql, parameters)
 
 ```c#
-DataTable QueryTable(string sql, params (string name, object value)[] parameters)
-DataTable QueryTable(string sql, IEnumerable<DbParameter> parameters)
+DataTable QueryTable(string sql, params (string name, object value)[] parameters);
+DataTable QueryTable(string sql, IEnumerable<DbParameter> parameters);
 ```
 
 Executes a SQL query and returns the result in a `DataTable`. The query can be either a stored procedure name or an ad hoc `SELECT` script.
