@@ -35,7 +35,7 @@ namespace Carbonated.Data.Internals
                 if (!col.AutoIncrement)
                 {
                     string colName = col.ColumnName;
-                    insertColumns.Add(colName);
+                    insertColumns.Add(dbFactory.DelimitIdentifier(colName));
                     insertValues.Add($"@{colName}");
                     parameters.Add(CreateMappingParameter(colName, colName));
                 }
@@ -55,11 +55,11 @@ namespace Carbonated.Data.Internals
                 string colName = col.ColumnName;
                 if (table.PrimaryKey.Contains(col))
                 {
-                    keyColumns.Add($"{colName} = @{colName}");
+                    keyColumns.Add($"{dbFactory.DelimitIdentifier(colName)} = @{colName}");
                 }
                 else
                 {
-                    setColumns.Add($"{colName} = @{colName}");
+                    setColumns.Add($"{dbFactory.DelimitIdentifier(colName)} = @{colName}");
                 }
                 parameters.Add(CreateMappingParameter(colName, colName));
             }
@@ -75,7 +75,7 @@ namespace Carbonated.Data.Internals
             foreach (var col in table.PrimaryKey)
             {
                 string colName = col.ColumnName;
-                keyColumns.Add($"{colName} = @{colName}");
+                keyColumns.Add($"{dbFactory.DelimitIdentifier(colName)} = @{colName}");
                 parameters.Add(CreateMappingParameter(colName, colName));
             }
 

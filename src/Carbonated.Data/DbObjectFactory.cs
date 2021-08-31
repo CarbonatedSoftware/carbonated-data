@@ -38,6 +38,15 @@ namespace Carbonated.Data
         public abstract DbParameter CreateParameter();
 
         /// <summary>
+        /// Formats the value passed in as a delimited identifier. Delimiting an
+        /// identifier allows SQL keywords to be used as column or other object names
+        /// in queries.
+        /// </summary>
+        /// <param name="identifier">The identifier name to delimit.</param>
+        /// <returns>The identifier in delimited form.</returns>
+        public abstract string DelimitIdentifier(string identifier);
+
+        /// <summary>
         /// Creates a DbCommand, determining the type automatically from the SQL text.
         /// </summary>
         /// <param name="sql">The SQL command text.</param>

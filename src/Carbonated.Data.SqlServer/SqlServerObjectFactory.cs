@@ -32,5 +32,19 @@ namespace Carbonated.Data.SqlServer
         /// </summary>
         /// <returns>The parameter.</returns>
         public override DbParameter CreateParameter() => new SqlParameter();
+
+        /// <summary>
+        /// Delimits an identifier with brackets, if it is not already delimited.
+        /// Delimiting an identifier allows SQL keywords to be used as column or other
+        /// object names in queries.
+        /// </summary>
+        /// <param name="identifier">The identifier name to delimit.</param>
+        /// <returns>The identifier in delimited form.</returns>
+        public override string DelimitIdentifier(string identifier)
+        {
+            if (identifier.StartsWith("[") && identifier.EndsWith("]"))
+                return identifier;
+            return $"[{identifier}]";
+        }
     }
 }
