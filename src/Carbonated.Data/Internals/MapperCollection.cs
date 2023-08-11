@@ -126,6 +126,8 @@ namespace Carbonated.Data.Internals
             mappers.TryAdd(typeof(double), new ValueTypeMapper<double>());
             mappers.TryAdd(typeof(decimal), new ValueTypeMapper<decimal>());
             mappers.TryAdd(typeof(DateTime), new ValueTypeMapper<DateTime>());
+            mappers.TryAdd(typeof(DateOnly), new ValueTypeMapper<DateOnly>());
+            mappers.TryAdd(typeof(TimeOnly), new ValueTypeMapper<TimeOnly>());
             mappers.TryAdd(typeof(Guid), new ValueTypeMapper<Guid>());
             mappers.TryAdd(typeof(char), new ValueTypeMapper<char>());
             mappers.TryAdd(typeof(string), new ValueTypeMapper<string>());
@@ -140,6 +142,8 @@ namespace Carbonated.Data.Internals
             mappers.TryAdd(typeof(double?), new ValueTypeMapper<double?>());
             mappers.TryAdd(typeof(decimal?), new ValueTypeMapper<decimal?>());
             mappers.TryAdd(typeof(DateTime?), new ValueTypeMapper<DateTime?>());
+            mappers.TryAdd(typeof(DateOnly?), new ValueTypeMapper<DateOnly?>());
+            mappers.TryAdd(typeof(TimeOnly?), new ValueTypeMapper<TimeOnly?>());
             mappers.TryAdd(typeof(Guid?), new ValueTypeMapper<Guid?>());
             mappers.TryAdd(typeof(char?), new ValueTypeMapper<char?>());
         }

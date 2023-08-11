@@ -16,6 +16,11 @@ namespace Carbonated.Data
         string ConnectionString { get; }
 
         /// <summary>
+        /// The underlying connection in use by the context.
+        /// </summary>
+        DbConnection Connection { get; }
+
+        /// <summary>
         /// The engine-specific object factory to create Db objects.
         /// </summary>
         DbObjectFactory ObjectFactory { get; }

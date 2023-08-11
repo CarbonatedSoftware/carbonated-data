@@ -65,7 +65,10 @@ namespace Carbonated.Data
         /// </summary>
         public DbObjectFactory ObjectFactory => dbFactory;
 
+
         #region DbContext
+
+        DbConnection DbContext.Connection => contextConnection;
 
         /// <summary>
         /// Opens a connection and returns a data context that will operate against that

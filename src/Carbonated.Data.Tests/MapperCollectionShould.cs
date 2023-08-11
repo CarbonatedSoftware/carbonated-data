@@ -1,5 +1,6 @@
 ﻿using System;
 using Carbonated.Data.Internals;
+using Carbonated.Data.Tests.Types;
 using NUnit.Framework;
 
 namespace Carbonated.Data.Tests
@@ -78,6 +79,8 @@ namespace Carbonated.Data.Tests
             Assert.IsTrue(mc.HasMapper<double>());
             Assert.IsTrue(mc.HasMapper<decimal>());
             Assert.IsTrue(mc.HasMapper<DateTime>());
+            Assert.IsTrue(mc.HasMapper<DateOnly>());
+            Assert.IsTrue(mc.HasMapper<TimeOnly>());
             Assert.IsTrue(mc.HasMapper<Guid>());
             Assert.IsTrue(mc.HasMapper<char>());
             Assert.IsTrue(mc.HasMapper<string>());
@@ -92,6 +95,8 @@ namespace Carbonated.Data.Tests
             Assert.IsTrue(mc.HasMapper<double?>());
             Assert.IsTrue(mc.HasMapper<decimal?>());
             Assert.IsTrue(mc.HasMapper<DateTime?>());
+            Assert.IsTrue(mc.HasMapper<DateOnly?>());
+            Assert.IsTrue(mc.HasMapper<TimeOnly?>());
             Assert.IsTrue(mc.HasMapper<Guid?>());
             Assert.IsTrue(mc.HasMapper<char?>());
         }

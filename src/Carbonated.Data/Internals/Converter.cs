@@ -26,6 +26,14 @@ namespace Carbonated.Data.Internals
             {
                 return ConvertGuid(value);
             }
+            else if (type == typeof(DateOnly))
+            {
+                return ConvertDateOnly(value);
+            }
+            else if (type == typeof(TimeOnly))
+            {
+                return ConvertTimeOnly(value);
+            }
             else if (type == typeof(char) && value.ToString() == string.Empty)
             {
                 // Empty char columns are possible in a database, but converting them
@@ -81,10 +89,53 @@ namespace Carbonated.Data.Internals
             throw new BindingException($"Value could not be parsed as {typeof(Guid).Name}: {value}");
         }
 
+        private static object ConvertDateOnly(object value)
+        {
+            if (value is DateTime date)
+            {
+                return DateOnly.FromDateTime(date);
+            }
+
+            string str = value.ToString();
+            if (str == string.Empty)
+            {
+                return null;
+            }
+
+            if (DateOnly.TryParse(str, out DateOnly dateOnly))
+            {
+                return dateOnly;
+            }
+
+            throw new BindingException($"Value could not be parsed as {typeof(DateOnly).Name}: {value}");
+        }
+
+        private static object ConvertTimeOnly(object value)
+        {
+            if (value is TimeSpan time)
+            {
+                return TimeOnly.FromTimeSpan(time);
+            }
+            string str = value.ToString();
+            if (str == string.Empty)
+            {
+                return null;
+            }
+
+            if (TimeOnly.TryParse(str, out TimeOnly timeOnly))
+            {
+                return timeOnly;
+            }
+
+            throw new BindingException($"Value could not be parsed as {typeof(TimeOnly).Name}: {value}");
+        }
+
         private static bool IsComplex(Type type)
         {
             return !(type.IsPrimitive
                 || type == typeof(DateTime)
+                || type == typeof(DateOnly)
+                || type == typeof(TimeOnly)
                 || type == typeof(decimal)
                 || type == typeof(Guid)
                 || type == typeof(string));
