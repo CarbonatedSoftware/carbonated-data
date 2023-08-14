@@ -1,8 +1,7 @@
-﻿namespace Carbonated.Data.Tests.Types
+﻿namespace Carbonated.Data.Tests.Types;
+
+public class EntityWithSemanticProperty
 {
-    public class EntityWithSemanticProperty
-    {
-        public int Id { get; set; }
-        public SemanticInt AgentNumber { get; set; }
-    }
+    public int Id { get; set; }
+    public SemanticInt AgentNumber { get; set; }
 }
