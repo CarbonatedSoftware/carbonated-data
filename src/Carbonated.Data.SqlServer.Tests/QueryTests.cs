@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Carbonated.Data.SqlServer.Tests.Models;
 using Microsoft.Identity.Client;
 using NUnit.Framework;
 

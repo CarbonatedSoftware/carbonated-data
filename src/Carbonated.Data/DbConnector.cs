@@ -340,7 +340,6 @@ namespace Carbonated.Data
             }
         }
 
-
         /// <summary>
         /// Builds a simple command with the connection and parameters set.
         /// </summary>
