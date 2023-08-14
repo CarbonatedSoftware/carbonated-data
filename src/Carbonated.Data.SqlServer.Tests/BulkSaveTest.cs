@@ -1,74 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Carbonated.Data.Internals;
+﻿using System.Collections.Generic;
+using System.Data;
 using Carbonated.Data.SqlServer.Tests.Models;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
 
-namespace Carbonated.Data.SqlServer.Tests
+namespace Carbonated.Data.SqlServer.Tests;
+
+/// <summary>
+/// Demonstrates that the EntityDataReader can be used by SqlBulkCopy for a bulk save process.
+/// </summary>
+internal class BulkSaveTest
 {
-    internal class BulkSaveTest
+    private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
+    private DbConnector connector;
+
+    [SetUp]
+    public void SetUp()
     {
-        private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
-        private DbConnector connector;
+        connector = new SqlServerDbConnector(TestConnectionString);
+    }
 
-        [SetUp]
-        public void SetUp()
-        {
-            connector = new SqlServerDbConnector(TestConnectionString);
-        }
+    [Test]
+    public void SaveUsingEntityDataReaderInPlaceOfTable()
+    {
+        // Initial state
+        int count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
+        Assert.That(count, Is.Zero);
 
-        [Test]
-        public void SaveUsingEntityDataReaderInPlaceOfTable()
-        {
-            // Initial state
-            int count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-            Assert.That(count, Is.Zero);
+        // Load as an entity
+        var cities = new List<City>() { new() { Name = "Jacksonville", State = "FL", Population = 842583 } };
 
-            // Load as an entity
-            var cities = new List<City>() { new() { Name = "Jacksonville", State = "FL", Population = 842583 } };
+        var reader = connector.CreateEntityReader(cities);
 
-            BulkSave(cities, "cities", "insert into cities (name, state, population) select name, state, population from #temp_cities");
+        BulkSave(reader, "cities", "insert into cities (name, state, population) select name, state, population from #temp_cities");
 
-            // Verify that the row was added
-            count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-            Assert.That(count, Is.EqualTo(1));
+        // Verify that the row was added
+        count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
+        Assert.That(count, Is.EqualTo(1));
 
-            // Restore test data state to starting point
-            connector.NonQuery("delete from cities where state = 'FL'");
-            count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-            Assert.That(count, Is.Zero);
-        }
+        // Restore test data state to starting point
+        connector.NonQuery("delete from cities where state = 'FL'");
+        count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
+        Assert.That(count, Is.Zero);
+    }
 
-        public void BulkSave<TEntity>(IEnumerable<TEntity> entities, string table, string mergeScript)
-        {
-            //TODO: make sure table name is valid
-            //TODO: make sure that there are entities present
-            //TODO: get property mapper for entities
+    private void BulkSave(IDataReader reader, string table, string mergeScript)
+    {
+        string tempTable = $"#temp_{table}";
 
-            if (connector.Mappers.Get<TEntity>() is not PropertyMapper<TEntity> mapper)
-            {
-                throw new Exception("We need a property mapper...");
-            }
-            var reader = new EntityDataReader<TEntity>(entities, mapper);
+        using var ctx = connector.OpenContext();
 
-            string tempTable = $"#temp_{table}";
+        ctx.NonQuery($"select top 0 * into {tempTable} from {table}");
 
-            var ctx = connector.OpenContext();
+        SqlBulkCopy sbc = new((SqlConnection)ctx.Connection);
+        sbc.DestinationTableName = tempTable;
+        sbc.WriteToServer(reader);
 
-            ctx.NonQuery($"select top 0 * into {tempTable} from {table}");
-
-            SqlBulkCopy sbc = new((SqlConnection)ctx.Connection);
-            sbc.DestinationTableName = tempTable;
-            // set mappings
-            // set Bulk options
-            sbc.WriteToServer(reader);
-
-            ctx.NonQuery(mergeScript);
-            //TODO: merge parmeters?
-        }
+        ctx.NonQuery(mergeScript);
     }
 }

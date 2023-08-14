@@ -10,14 +10,7 @@
     <Copyright>© 2023 Carbonated Software</Copyright>
     <PackageProjectUrl>https://github.com/CarbonatedSoftware/carbonated-data</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/CarbonatedSoftware/carbonated-data/blob/master/LICENSE</PackageLicenseUrl>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <DocumentationFile>bin\Debug\net6.0\Carbonated.Data.SqlServer.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <DocumentationFile>bin\Release\net6.0\Carbonated.Data.SqlServer.xml</DocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

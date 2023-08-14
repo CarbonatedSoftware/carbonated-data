@@ -6,19 +6,12 @@
     <Version>2.0.0</Version>
     <Authors>Carbonated Software</Authors>
     <Description>Simple data access library.</Description>
-    <Copyright>© 2021 Carbonated Software</Copyright>
+    <Copyright>© 2023 Carbonated Software</Copyright>
     <PackageProjectUrl>https://github.com/CarbonatedSoftware/carbonated-data</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/CarbonatedSoftware/carbonated-data/blob/master/LICENSE</PackageLicenseUrl>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <DocumentationFile>bin\Debug\net6.0\Carbonated.Data.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <DocumentationFile>bin\Release\net6.0\Carbonated.Data.xml</DocumentationFile>
-  </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
