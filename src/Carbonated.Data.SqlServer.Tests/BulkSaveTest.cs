@@ -12,7 +12,7 @@ namespace Carbonated.Data.SqlServer.Tests
 {
     internal class BulkSaveTest
     {
-        private const string TestConnectionString = @"Data Source=localhost;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
+        private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
         private DbConnector connector;
 
         [SetUp]
