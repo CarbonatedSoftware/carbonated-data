@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Carbonated.Data.SqlServer.Tests.Models;
 using NUnit.Framework;
 
 namespace Carbonated.Data.SqlServer.Tests;
@@ -155,13 +156,5 @@ public class ConnectorTests
         // Verify that we're back to our starting point
         count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
         Assert.AreEqual(0, count);
-    }
-
-    class City
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string State { get; set; }
-        public int Population { get; set; }
     }
 }

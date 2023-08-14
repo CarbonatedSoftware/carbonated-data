@@ -1,4 +1,5 @@
 ﻿using System;
+using Carbonated.Data.SqlServer.Tests.Models;
 using NUnit.Framework;
 
 namespace Carbonated.Data.SqlServer.Tests;
