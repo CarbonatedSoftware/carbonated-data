@@ -40,6 +40,9 @@ namespace Carbonated.Data.Internals
         /// </summary>
         internal Func<object, object> ValueConverter { get; set; }
 
+        //TODO: help text and naming
+        internal Func<object, object> ToStorageConverter { get; set; }
+
         /// <summary>
         /// When set, indicates that the field should be ignored during data binding.
         /// </summary>

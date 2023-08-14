@@ -55,7 +55,9 @@ namespace Carbonated.Data.Internals
         /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
         /// <param name="field">The field name to load data from.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> Map<TProperty>(Expression<Func<TEntity, TProperty>> property, string field)
+        public PropertyMapper<TEntity> Map<TProperty>(
+            Expression<Func<TEntity, TProperty>> property,
+            string field)
             => MapProp(property, field, defaultCondition, null);
 
         /// <summary>
@@ -67,8 +69,20 @@ namespace Carbonated.Data.Internals
         /// <param name="field">The field name to load data from.</param>
         /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> Map<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
+        public PropertyMapper<TEntity> Map<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field, 
+            Func<object, object> valueConverter)
             => MapProp(property, field, defaultCondition, valueConverter);
+
+        public PropertyMapper<TEntity> Map<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field, 
+            Func<object, object> fromStorageConverter, 
+            Func<object, object> toStorageConverter)
+        {
+            return MapProp(property, field, defaultCondition, fromStorageConverter, toStorageConverter);
+        }
 
         /// <summary>
         /// Maps an Optional property to the specified field name
@@ -77,7 +91,9 @@ namespace Carbonated.Data.Internals
         /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
         /// <param name="field">The field name to load data from.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> MapOptional<TProperty>(Expression<Func<TEntity, TProperty>> property, string field) 
+        public PropertyMapper<TEntity> MapOptional<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field) 
             => MapProp(property, field, PopulationCondition.Optional, null);
 
         /// <summary>
@@ -89,8 +105,13 @@ namespace Carbonated.Data.Internals
         /// <param name="field">The field name to load data from.</param>
         /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> MapOptional<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
+        public PropertyMapper<TEntity> MapOptional<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field, 
+            Func<object, object> valueConverter)
             => MapProp(property, field, PopulationCondition.Optional, valueConverter);
+
+        //TODO: version with toStorageConverter
 
         /// <summary>
         /// Maps a Required property to the specified field name
@@ -99,7 +120,9 @@ namespace Carbonated.Data.Internals
         /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
         /// <param name="field">The field name to load data from.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> MapRequired<TProperty>(Expression<Func<TEntity, TProperty>> property, string field) 
+        public PropertyMapper<TEntity> MapRequired<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field) 
             => MapProp(property, field, PopulationCondition.Required, null);
 
         /// <summary>
@@ -111,8 +134,13 @@ namespace Carbonated.Data.Internals
         /// <param name="field">The field name to load data from.</param>
         /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> MapRequired<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
+        public PropertyMapper<TEntity> MapRequired<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field, 
+            Func<object, object> valueConverter)
             => MapProp(property, field, PopulationCondition.Required, valueConverter);
+
+        //TODO: version with toStorageConverter
 
         /// <summary>
         /// Maps a NotNull property to the specified field name
@@ -121,7 +149,9 @@ namespace Carbonated.Data.Internals
         /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
         /// <param name="field">The field name to load data from.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> MapNotNull<TProperty>(Expression<Func<TEntity, TProperty>> property, string field) 
+        public PropertyMapper<TEntity> MapNotNull<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field) 
             => MapProp(property, field, PopulationCondition.NotNull, null);
 
         /// <summary>
@@ -133,8 +163,13 @@ namespace Carbonated.Data.Internals
         /// <param name="field">The field name to load data from.</param>
         /// <param name="valueConverter">Function that will convert values as they are loaded.</param>
         /// <returns>The property mapper.</returns>
-        public PropertyMapper<TEntity> MapNotNull<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, Func<object, object> valueConverter)
+        public PropertyMapper<TEntity> MapNotNull<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field, 
+            Func<object, object> valueConverter)
             => MapProp(property, field, PopulationCondition.NotNull, valueConverter);
+
+        //TODO: version with toStorageConverter
 
         /// <summary>
         /// Marks a property's population condition as Optional. This will override the default condition set
@@ -201,7 +236,12 @@ namespace Carbonated.Data.Internals
             return this;
         }
 
-        private PropertyMapper<TEntity> MapProp<TProperty>(Expression<Func<TEntity, TProperty>> property, string field, PopulationCondition condition, Func<object, object> valueConverter)
+        private PropertyMapper<TEntity> MapProp<TProperty>(
+            Expression<Func<TEntity, TProperty>> property, 
+            string field, 
+            PopulationCondition condition, 
+            Func<object, object> valueConverter, 
+            Func<object, object> toStorageConverter = null)
         {
             var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
             if (PropertyIsMappedToDifferentField(field, prop))
@@ -209,9 +249,8 @@ namespace Carbonated.Data.Internals
                 throw new MappingException($"Field cannot be mapped to more than one property: {field}");
             }
 
-            //TODO: Consider updating rather than removing and re-adding.
             RemoveGeneratedMapping(prop);
-            mappings.Add(new PropertyMapInfo(field, prop) { Condition = condition, ValueConverter = valueConverter });
+            mappings.Add(new PropertyMapInfo(field, prop) { Condition = condition, ValueConverter = valueConverter, ToStorageConverter = toStorageConverter });
 
             return this;
         }

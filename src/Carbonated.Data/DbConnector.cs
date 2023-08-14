@@ -291,6 +291,11 @@ namespace Carbonated.Data
                     adapter.FillSchema(set, SchemaType.Source);
                     adapter.Fill(set);
 
+                    //TODO: try with Table again?
+                    //var table = new DataTable();
+                    //adapter.FillSchema(table, SchemaType.Source);
+                    //adapter.Fill(table);
+
                     return set.Tables[0];
                 }
             }
