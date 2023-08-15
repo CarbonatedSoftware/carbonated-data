@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Schema;
 
 namespace Carbonated.Data.Internals;
 
@@ -343,40 +346,76 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
     /// <returns>The newly created and populate instance.</returns>
     protected internal override TEntity CreateInstance(Record record)
     {
+        var mappings = Mappings.Where(m => !m.IsIgnored).ToList();
+
         var instance = Activator.CreateInstance<TEntity>();
-        foreach (var mapping in Mappings.Where(m => !m.IsIgnored))
+        foreach (var mapping in mappings)
         {
-            if (mapping.Condition == PopulationCondition.Required && !record.HasField(mapping.Field))
-            {
-                throw new BindingException($"A required field was not found in the data record: {mapping.Field}");
-            }
-
-            var value = record.GetValue(mapping.Field);
-            var prop = mapping.Property;
-
-            if (mapping.Condition == PopulationCondition.NotNull && (value == null || value is DBNull))
-            {
-                throw new BindingException($"The value of {mapping.Field} may not be null.");
-            }
-
-            if (mapping.FromDbConverter != null)
-            {
-                prop.SetValue(instance, mapping.FromDbConverter(value), null);
-            }
-            else
-            {
-                if (valueConverters.TryGetValue(prop.PropertyType, out ValueConverter conv))
-                {
-                    prop.SetValue(instance, conv.Convert(value), null);
-                }
-                else
-                {
-                    prop.SetValue(instance, Converter.ToType(value, prop.PropertyType), null);
-                }
-            }
+            mapping.Property.SetValue(instance, GetValue(record, mapping));
         }
         AfterBindAction?.Invoke(record, instance);
 
         return instance;
+    }
+
+    protected internal TEntity CreateInstance2(Record record)
+    {
+        //TODO: cache the constructor used
+
+        var mappings = Mappings.Where(m => !m.IsIgnored).ToList();
+
+        if (typeof(TEntity).GetConstructor(Type.EmptyTypes) != null)
+        {
+            return CreateInstance(record);
+        }
+
+        var ctors = typeof(TEntity)
+            .GetConstructors(BindingFlags.Instance | BindingFlags.Public)
+            .OrderBy(c => c.GetParameters().Length);
+
+        foreach (var ctor in ctors)
+        {
+            var pars = ctor.GetParameters();
+            var ctorMappings = mappings.Where(m => pars.Any(p => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+            if (pars.Length == ctorMappings.Count)
+            {
+                var args = pars.Select(p => GetValue(record, ctorMappings.Single(m => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase)))).ToArray();
+                var instance = (TEntity)ctor.Invoke(args);
+                foreach (var mapping in mappings.Except(ctorMappings))
+                {
+                    mapping.Property.SetValue(instance, GetValue(record, mapping));
+                }
+                AfterBindAction?.Invoke(record, instance);
+                return instance;
+            }
+        }
+
+        return default; //TODO: I think we can throw if we get here: no suitable constructor found...
+    }
+
+    private object GetValue(Record record, PropertyMapInfo mapping)
+    {
+        if (mapping.Condition == PopulationCondition.Required && !record.HasField(mapping.Field))
+        {
+            throw new BindingException($"A required field was not found in the data record: {mapping.Field}");
+        }
+
+        var value = record.GetValue(mapping.Field);
+        var prop = mapping.Property;
+
+        if (mapping.Condition == PopulationCondition.NotNull && (value == null || value is DBNull))
+        {
+            throw new BindingException($"The value of {mapping.Field} may not be null.");
+        }
+
+        if (mapping.FromDbConverter != null)
+        {
+            return mapping.FromDbConverter(value);
+        }
+        if (valueConverters.TryGetValue(prop.PropertyType, out ValueConverter conv))
+        {
+            return conv.Convert(value);
+        }
+        return Converter.ToType(value, prop.PropertyType);
     }
 }
