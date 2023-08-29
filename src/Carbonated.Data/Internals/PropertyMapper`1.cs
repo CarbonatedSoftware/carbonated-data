@@ -377,16 +377,22 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
     /// <returns>The newly created and populate instance.</returns>
     protected internal override TEntity CreateInstance(Record record)
     {
-        var mappings = Mappings.Where(m => !m.IsIgnored || m.IgnoreBehavior == IgnoreBehavior.OnSave).ToList();
+        creationInfo ??= new InstanceCreationInfo(Mappings);
 
-        var instance = Activator.CreateInstance<TEntity>();
-        foreach (var mapping in mappings)
+        TEntity instance = creationInfo.UseDefaultCtor
+            ? Activator.CreateInstance<TEntity>()
+            : (TEntity)creationInfo.Ctor.Invoke(GetCtorArgs(record));
+        foreach (var mapping in creationInfo.NonCtorMappings)
         {
             mapping.Property.SetValue(instance, GetValue(record, mapping));
         }
         AfterBindAction?.Invoke(record, instance);
-
         return instance;
+
+        object[] GetCtorArgs(Record record)
+        {
+            return creationInfo.CtorMappings.Select(mapping => GetValue(record, mapping)).ToArray();
+        }
     }
 
     private object GetValue(Record record, PropertyMapInfo mapping)
@@ -413,5 +419,49 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
             return conv.Convert(value);
         }
         return Converter.ToType(value, prop.PropertyType);
+    }
+
+    private InstanceCreationInfo creationInfo = null;
+
+    private class InstanceCreationInfo
+    {
+        internal bool UseDefaultCtor { get; }
+        internal ConstructorInfo Ctor { get; }
+        internal List<PropertyMapInfo> CtorMappings { get; }
+        internal List<PropertyMapInfo> NonCtorMappings { get; }
+
+        internal InstanceCreationInfo(IEnumerable<PropertyMapInfo> mappings)
+        {
+            var filteredMappings = mappings.Where(m => !m.IsIgnored || m.IgnoreBehavior == IgnoreBehavior.OnSave).ToList();
+
+            var defaultCtor = typeof(TEntity).GetConstructor(Type.EmptyTypes);
+            if (defaultCtor != null)
+            {
+                UseDefaultCtor = true;
+                Ctor = defaultCtor;
+                CtorMappings = new List<PropertyMapInfo>();
+                NonCtorMappings = filteredMappings;
+                return;
+            }
+
+            var ctors = typeof(TEntity)
+                .GetConstructors(BindingFlags.Instance | BindingFlags.Public)
+                .Select(c => (ctor: c, parameters: c.GetParameters()))
+                .OrderBy(c => c.parameters.Length);
+
+            foreach (var ctor in ctors)
+            {
+                var ctorMappings = filteredMappings.Where(m => ctor.parameters.Any(p => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+                if (ctor.parameters.Length == ctorMappings.Count)
+                {
+                    Ctor = ctor.ctor;
+                    CtorMappings = ctor.parameters.Select(p => ctorMappings.Single(m => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+                    NonCtorMappings = filteredMappings.Except(ctorMappings).ToList();
+                    return;
+                }
+            }
+
+            throw new Exception("Could not find suitable constructor for type: " + typeof(TEntity).FullName);
+        }
     }
 }
