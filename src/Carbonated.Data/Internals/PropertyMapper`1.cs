@@ -260,23 +260,54 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
         => SetCondition(property, PopulationCondition.NotNull);
 
     /// <summary>
-    /// Marks a property to be ignored. Ignored properties will not have any data loaded for them, even if
-    /// there is a matching field available in the data source.
+    /// Marks a property to be ignored. The property will not have any data loaded for it, even if there is
+    /// a matching field available in the data source, and will not be read as a field by the
+    /// <see cref="EntityDataReader{TEntity}"/>.
     /// </summary>
     /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
     /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
     /// <returns>The property mapper.</returns>
     public PropertyMapper<TEntity> Ignore<TProperty>(Expression<Func<TEntity, TProperty>> property)
     {
+        return Ignore(property, IgnoreBehavior.Both);
+    }
+
+    /// <summary>
+    /// Marks a property to be ignored during load. The property will not have any data loaded for it, even
+    /// if there is a matching field available in the data source.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+    /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+    /// <returns>The property mapper.</returns>
+    public PropertyMapper<TEntity> IgnoreOnLoad<TProperty>(Expression<Func<TEntity,TProperty>> property)
+    {
+        return Ignore(property, IgnoreBehavior.OnLoad);
+    }
+
+    /// <summary>
+    /// Marks a property to be ignored during save. The property will not be read as a field by the
+    /// <see cref="EntityDataReader{TEntity}"/>, even if a value is set.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+    /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+    /// <returns>The property mapper.</returns>
+    public PropertyMapper<TEntity> IgnoreOnSave<TProperty>(Expression<Func<TEntity, TProperty>> property)
+    {
+        return Ignore(property, IgnoreBehavior.OnSave);
+    }
+
+    private PropertyMapper<TEntity> Ignore<TProperty>(Expression<Func<TEntity, TProperty>> property, IgnoreBehavior ignoreBehavior = IgnoreBehavior.Both)
+    {
         var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
         var existing = mappings.SingleOrDefault(m => m.Property.Name == prop.Name);
         if (existing == null)
         {
-            mappings.Add(new PropertyMapInfo(prop.Name, prop) { IsIgnored = true });
+            mappings.Add(new PropertyMapInfo(prop.Name, prop) { IsIgnored = true, IgnoreBehavior = ignoreBehavior });
         }
         else
         {
             existing.IsIgnored = true;
+            existing.IgnoreBehavior = ignoreBehavior;
         }
         return this;
     }
@@ -346,7 +377,7 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
     /// <returns>The newly created and populate instance.</returns>
     protected internal override TEntity CreateInstance(Record record)
     {
-        var mappings = Mappings.Where(m => !m.IsIgnored).ToList();
+        var mappings = Mappings.Where(m => !m.IsIgnored || m.IgnoreBehavior == IgnoreBehavior.OnSave).ToList();
 
         var instance = Activator.CreateInstance<TEntity>();
         foreach (var mapping in mappings)
@@ -356,41 +387,6 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
         AfterBindAction?.Invoke(record, instance);
 
         return instance;
-    }
-
-    protected internal TEntity CreateInstance2(Record record)
-    {
-        //TODO: cache the constructor used
-
-        var mappings = Mappings.Where(m => !m.IsIgnored).ToList();
-
-        if (typeof(TEntity).GetConstructor(Type.EmptyTypes) != null)
-        {
-            return CreateInstance(record);
-        }
-
-        var ctors = typeof(TEntity)
-            .GetConstructors(BindingFlags.Instance | BindingFlags.Public)
-            .OrderBy(c => c.GetParameters().Length);
-
-        foreach (var ctor in ctors)
-        {
-            var pars = ctor.GetParameters();
-            var ctorMappings = mappings.Where(m => pars.Any(p => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase))).ToList();
-            if (pars.Length == ctorMappings.Count)
-            {
-                var args = pars.Select(p => GetValue(record, ctorMappings.Single(m => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase)))).ToArray();
-                var instance = (TEntity)ctor.Invoke(args);
-                foreach (var mapping in mappings.Except(ctorMappings))
-                {
-                    mapping.Property.SetValue(instance, GetValue(record, mapping));
-                }
-                AfterBindAction?.Invoke(record, instance);
-                return instance;
-            }
-        }
-
-        return default; //TODO: I think we can throw if we get here: no suitable constructor found...
     }
 
     private object GetValue(Record record, PropertyMapInfo mapping)

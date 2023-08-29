@@ -163,7 +163,7 @@ public class PropertyMapperShould
     }
 
     [Test]
-    public void NotLoadFromRecordWhenPropertyIsMarkedIgnore()
+    public void NotLoadFromRecordWhenPropertyIsMarkedIgnoreBoth()
     {
         var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
 
@@ -172,6 +172,30 @@ public class PropertyMapperShould
         var inst = mapper.CreateInstance(record);
 
         Assert.AreEqual(new Entity(10, "John Q", null), inst);
+    }
+
+    [Test]
+    public void NotLoadFromRecordWhenPropertyIsMarkedIgnoreOnLoad()
+    {
+        var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
+
+        var mapper = PropMapper<Entity>()
+            .IgnoreOnLoad(x => x.Title);
+        var inst = mapper.CreateInstance(record);
+
+        Assert.AreEqual(new Entity(10, "John Q", null), inst);
+    }
+
+    [Test]
+    public void LoadFromRecordWhenPropertyIsMarkedIgnoreOnSave()
+    {
+        var record = Record(("id", 10), ("name", "John Q"), ("title", "Tester"));
+
+        var mapper = PropMapper<Entity>()
+            .IgnoreOnSave(x => x.Title);
+        var inst = mapper.CreateInstance(record);
+
+        Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
     }
 
     [Test]
