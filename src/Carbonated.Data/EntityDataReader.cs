@@ -34,7 +34,7 @@ public sealed class EntityDataReader<TEntity> : IDataRecord, IDataReader
 
         recordCount = this.entities.Count;
 
-        propertyMappings = this.propertyMapper.Mappings.Where(m => !m.IsIgnored).ToList();
+        propertyMappings = this.propertyMapper.Mappings.Where(m => !m.IsIgnored || m.IgnoreBehavior == IgnoreBehavior.OnLoad).ToList();
         fieldMappings = new Dictionary<string, int>(propertyMappings.Count);
         for (int i = 0; i < propertyMappings.Count; i++)
         {

@@ -57,7 +57,7 @@ public class EntityDataReaderShould
     }
 
     [Test]
-    public void IgnoreFieldsMarkedAsIgnoredWhenReading()
+    public void IgnoreFieldsMarkedAsIgnoreBoth()
     {
         var propertyMapper = new MapperCollection().Configure<Entity>()
             .Ignore(x => x.Name);
@@ -81,6 +81,64 @@ public class EntityDataReaderShould
         Assert.That(edr["Title"], Is.EqualTo("E2"));
 
         Assert.That(() => edr["Name"], Throws.Exception);
+
+        Assert.That(edr.Read(), Is.False);
+    }
+
+    [Test]
+    public void IgnoreFieldsMarkedAsIgnoreOnSave()
+    {
+        var propertyMapper = new MapperCollection().Configure<Entity>()
+            .IgnoreOnSave(x => x.Name);
+
+        var entities = new List<Entity>()
+        {
+            new(1, "Foo", "E1"),
+            new(2, "Bar", "E2")
+        };
+
+        var edr = new EntityDataReader<Entity>(entities, propertyMapper);
+
+        Assert.That(edr.FieldCount, Is.EqualTo(2));
+
+        Assert.That(edr.Read(), Is.True);
+        Assert.That(edr[0], Is.EqualTo(1));
+        Assert.That(edr[1], Is.EqualTo("E1"));
+
+        Assert.That(edr.Read(), Is.True);
+        Assert.That(edr["Id"], Is.EqualTo(2));
+        Assert.That(edr["Title"], Is.EqualTo("E2"));
+
+        Assert.That(() => edr["Name"], Throws.Exception);
+
+        Assert.That(edr.Read(), Is.False);
+    }
+
+    [Test]
+    public void NotIgnoreFieldsMarkedAsIgnoreOnLoad()
+    {
+        var propertyMapper = new MapperCollection().Configure<Entity>()
+            .IgnoreOnLoad(x => x.Name);
+
+        var entities = new List<Entity>()
+        {
+            new(1, "Foo", "E1"),
+            new(2, "Bar", "E2")
+        };
+
+        var edr = new EntityDataReader<Entity>(entities, propertyMapper);
+
+        Assert.That(edr.FieldCount, Is.EqualTo(3));
+
+        Assert.That(edr.Read(), Is.True);
+        Assert.That(edr[0], Is.EqualTo(1));
+        Assert.That(edr[1], Is.EqualTo("Foo"));
+        Assert.That(edr[2], Is.EqualTo("E1"));
+
+        Assert.That(edr.Read(), Is.True);
+        Assert.That(edr["Id"], Is.EqualTo(2));
+        Assert.That(edr["Name"], Is.EqualTo("Bar"));
+        Assert.That(edr["Title"], Is.EqualTo("E2"));
 
         Assert.That(edr.Read(), Is.False);
     }

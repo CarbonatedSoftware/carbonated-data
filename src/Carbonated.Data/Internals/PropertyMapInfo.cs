@@ -50,4 +50,9 @@ internal class PropertyMapInfo
     /// When set, indicates that the field should be ignored during data binding.
     /// </summary>
     internal bool IsIgnored { get; set; }
+
+    /// <summary>
+    /// When is IsIgnored is set, the ignore behavior that will be used.
+    /// </summary>
+    internal IgnoreBehavior IgnoreBehavior { get; set; } = IgnoreBehavior.Both;
 }

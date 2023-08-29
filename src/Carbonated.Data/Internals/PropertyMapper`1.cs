@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Schema;
 
 namespace Carbonated.Data.Internals;
 
@@ -257,23 +260,54 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
         => SetCondition(property, PopulationCondition.NotNull);
 
     /// <summary>
-    /// Marks a property to be ignored. Ignored properties will not have any data loaded for them, even if
-    /// there is a matching field available in the data source.
+    /// Marks a property to be ignored. The property will not have any data loaded for it, even if there is
+    /// a matching field available in the data source, and will not be read as a field by the
+    /// <see cref="EntityDataReader{TEntity}"/>.
     /// </summary>
     /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
     /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
     /// <returns>The property mapper.</returns>
     public PropertyMapper<TEntity> Ignore<TProperty>(Expression<Func<TEntity, TProperty>> property)
     {
+        return Ignore(property, IgnoreBehavior.Both);
+    }
+
+    /// <summary>
+    /// Marks a property to be ignored during load. The property will not have any data loaded for it, even
+    /// if there is a matching field available in the data source.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+    /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+    /// <returns>The property mapper.</returns>
+    public PropertyMapper<TEntity> IgnoreOnLoad<TProperty>(Expression<Func<TEntity,TProperty>> property)
+    {
+        return Ignore(property, IgnoreBehavior.OnLoad);
+    }
+
+    /// <summary>
+    /// Marks a property to be ignored during save. The property will not be read as a field by the
+    /// <see cref="EntityDataReader{TEntity}"/>, even if a value is set.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property being mapped.</typeparam>
+    /// <param name="property">Expression that specifies which property of the entity is being mapped.</param>
+    /// <returns>The property mapper.</returns>
+    public PropertyMapper<TEntity> IgnoreOnSave<TProperty>(Expression<Func<TEntity, TProperty>> property)
+    {
+        return Ignore(property, IgnoreBehavior.OnSave);
+    }
+
+    private PropertyMapper<TEntity> Ignore<TProperty>(Expression<Func<TEntity, TProperty>> property, IgnoreBehavior ignoreBehavior = IgnoreBehavior.Both)
+    {
         var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
         var existing = mappings.SingleOrDefault(m => m.Property.Name == prop.Name);
         if (existing == null)
         {
-            mappings.Add(new PropertyMapInfo(prop.Name, prop) { IsIgnored = true });
+            mappings.Add(new PropertyMapInfo(prop.Name, prop) { IsIgnored = true, IgnoreBehavior = ignoreBehavior });
         }
         else
         {
             existing.IsIgnored = true;
+            existing.IgnoreBehavior = ignoreBehavior;
         }
         return this;
     }
@@ -343,40 +377,91 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
     /// <returns>The newly created and populate instance.</returns>
     protected internal override TEntity CreateInstance(Record record)
     {
-        var instance = Activator.CreateInstance<TEntity>();
-        foreach (var mapping in Mappings.Where(m => !m.IsIgnored))
+        creationInfo ??= new InstanceCreationInfo(Mappings);
+
+        TEntity instance = creationInfo.UseDefaultCtor
+            ? Activator.CreateInstance<TEntity>()
+            : (TEntity)creationInfo.Ctor.Invoke(GetCtorArgs(record));
+        foreach (var mapping in creationInfo.NonCtorMappings)
         {
-            if (mapping.Condition == PopulationCondition.Required && !record.HasField(mapping.Field))
-            {
-                throw new BindingException($"A required field was not found in the data record: {mapping.Field}");
-            }
-
-            var value = record.GetValue(mapping.Field);
-            var prop = mapping.Property;
-
-            if (mapping.Condition == PopulationCondition.NotNull && (value == null || value is DBNull))
-            {
-                throw new BindingException($"The value of {mapping.Field} may not be null.");
-            }
-
-            if (mapping.FromDbConverter != null)
-            {
-                prop.SetValue(instance, mapping.FromDbConverter(value), null);
-            }
-            else
-            {
-                if (valueConverters.TryGetValue(prop.PropertyType, out ValueConverter conv))
-                {
-                    prop.SetValue(instance, conv.Convert(value), null);
-                }
-                else
-                {
-                    prop.SetValue(instance, Converter.ToType(value, prop.PropertyType), null);
-                }
-            }
+            mapping.Property.SetValue(instance, GetValue(record, mapping));
         }
         AfterBindAction?.Invoke(record, instance);
-
         return instance;
+
+        object[] GetCtorArgs(Record record)
+        {
+            return creationInfo.CtorMappings.Select(mapping => GetValue(record, mapping)).ToArray();
+        }
+    }
+
+    private object GetValue(Record record, PropertyMapInfo mapping)
+    {
+        if (mapping.Condition == PopulationCondition.Required && !record.HasField(mapping.Field))
+        {
+            throw new BindingException($"A required field was not found in the data record: {mapping.Field}");
+        }
+
+        var value = record.GetValue(mapping.Field);
+        var prop = mapping.Property;
+
+        if (mapping.Condition == PopulationCondition.NotNull && (value == null || value is DBNull))
+        {
+            throw new BindingException($"The value of {mapping.Field} may not be null.");
+        }
+
+        if (mapping.FromDbConverter != null)
+        {
+            return mapping.FromDbConverter(value);
+        }
+        if (valueConverters.TryGetValue(prop.PropertyType, out ValueConverter conv))
+        {
+            return conv.Convert(value);
+        }
+        return Converter.ToType(value, prop.PropertyType);
+    }
+
+    private InstanceCreationInfo creationInfo = null;
+
+    private class InstanceCreationInfo
+    {
+        internal bool UseDefaultCtor { get; }
+        internal ConstructorInfo Ctor { get; }
+        internal List<PropertyMapInfo> CtorMappings { get; }
+        internal List<PropertyMapInfo> NonCtorMappings { get; }
+
+        internal InstanceCreationInfo(IEnumerable<PropertyMapInfo> mappings)
+        {
+            var filteredMappings = mappings.Where(m => !m.IsIgnored || m.IgnoreBehavior == IgnoreBehavior.OnSave).ToList();
+
+            var defaultCtor = typeof(TEntity).GetConstructor(Type.EmptyTypes);
+            if (defaultCtor != null)
+            {
+                UseDefaultCtor = true;
+                Ctor = defaultCtor;
+                CtorMappings = new List<PropertyMapInfo>();
+                NonCtorMappings = filteredMappings;
+                return;
+            }
+
+            var ctors = typeof(TEntity)
+                .GetConstructors(BindingFlags.Instance | BindingFlags.Public)
+                .Select(c => (ctor: c, parameters: c.GetParameters()))
+                .OrderBy(c => c.parameters.Length);
+
+            foreach (var ctor in ctors)
+            {
+                var ctorMappings = filteredMappings.Where(m => ctor.parameters.Any(p => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+                if (ctor.parameters.Length == ctorMappings.Count)
+                {
+                    Ctor = ctor.ctor;
+                    CtorMappings = ctor.parameters.Select(p => ctorMappings.Single(m => p.Name.Equals(m.Property.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+                    NonCtorMappings = filteredMappings.Except(ctorMappings).ToList();
+                    return;
+                }
+            }
+
+            throw new Exception("Could not find suitable constructor for type: " + typeof(TEntity).FullName);
+        }
     }
 }

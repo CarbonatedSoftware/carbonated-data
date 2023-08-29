@@ -3,14 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Carbonated Software</Authors>
     <Description>SqlServer implementation of Carbonated Data.</Description>
     <Copyright>© 2023 Carbonated Software</Copyright>
     <PackageProjectUrl>https://github.com/CarbonatedSoftware/carbonated-data</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/CarbonatedSoftware/carbonated-data/blob/master/LICENSE</PackageLicenseUrl>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
