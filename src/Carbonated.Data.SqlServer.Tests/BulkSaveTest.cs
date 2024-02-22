@@ -20,6 +20,12 @@ internal class BulkSaveTest
         connector = new SqlServerDbConnector(TestConnectionString);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        connector.Dispose();
+    }
+
     [Test]
     public void SaveUsingEntityDataReaderInPlaceOfTable()
     {

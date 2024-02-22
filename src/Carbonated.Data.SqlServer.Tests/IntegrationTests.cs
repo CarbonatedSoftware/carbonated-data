@@ -18,13 +18,22 @@ public class ConnectorTests
         connector = new SqlServerDbConnector(TestConnectionString);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        connector.Dispose();
+    }
+
     [Test]
     public void AdHocEntityQuery()
     {
         var cities = connector.Query<City>("select * from cities");
 
-        Assert.AreEqual(12, cities.Count());
-        Assert.AreEqual("New York", cities.First().Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(cities.Count(), Is.EqualTo(12));
+            Assert.That(cities.First().Name, Is.EqualTo("New York"));
+        });
     }
 
     [Test]
@@ -32,8 +41,11 @@ public class ConnectorTests
     {
         var city = connector.Query<City>("select * from cities where id = @id", ("@id", 6)).SingleOrDefault();
 
-        Assert.AreEqual(6, city.Id);
-        Assert.AreEqual("Phoenix", city.Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(city.Id, Is.EqualTo(6));
+            Assert.That(city.Name, Is.EqualTo("Phoenix"));
+        });
     }
 
     [Test]
@@ -41,8 +53,11 @@ public class ConnectorTests
     {
         var cities = connector.Query<City>("GetCitiesByState", ("@state", "TX"));
 
-        Assert.AreEqual(4, cities.Count());
-        Assert.AreEqual("Houston", cities.First().Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(cities.Count(), Is.EqualTo(4));
+            Assert.That(cities.First().Name, Is.EqualTo("Houston"));
+        });
     }
 
     [Test]
@@ -50,7 +65,7 @@ public class ConnectorTests
     {
         int count = connector.QueryScalar<int>("select count(*) from cities");
 
-        Assert.AreEqual(12, count);
+        Assert.That(count, Is.EqualTo(12));
     }
 
     [Test]
@@ -58,19 +73,19 @@ public class ConnectorTests
     {
         // Confirm initial state
         City city = connector.Query<City>("select * from cities where id = @id", ("@id", 11)).Single();
-        Assert.AreEqual(885400, city.Population);
+        Assert.That(city.Population, Is.EqualTo(885400));
 
         // Update then very new state
         connector.NonQuery("update cities set population = 50 where name = @name", ("@name", "Austin"));
 
         city = connector.Query<City>("select * from cities where id = @id", ("@id", 11)).Single();
-        Assert.AreEqual(50, city.Population);
+        Assert.That(city.Population, Is.EqualTo(50));
 
         // Reset to initial state and verify
         connector.NonQuery("update cities set population = 885400 where id = @id", ("@id", 11));
 
         city = connector.Query<City>("select * from cities where id = @id", ("@id", 11)).Single();
-        Assert.AreEqual(885400, city.Population);
+        Assert.That(city.Population, Is.EqualTo(885400));
     }
 
     [Test]
@@ -87,8 +102,11 @@ public class ConnectorTests
             }
         }
 
-        Assert.IsTrue(reader.IsClosed);
-        Assert.AreEqual(12, cities.Count);
+        Assert.Multiple(() =>
+        {
+            Assert.That(reader.IsClosed, Is.True);
+            Assert.That(cities, Has.Count.EqualTo(12));
+        });
     }
 
     [Test]
@@ -102,8 +120,11 @@ public class ConnectorTests
             cities = reader.TakeWhile(city => city.Population > 2_000_000).ToList();
         }
 
-        Assert.IsTrue(reader.IsClosed);
-        Assert.AreEqual(4, cities.Count());
+        Assert.Multiple(() =>
+        {
+            Assert.That(reader.IsClosed, Is.True);
+            Assert.That(cities.Count(), Is.EqualTo(4));
+        });
     }
 
     [Test]
@@ -114,14 +135,14 @@ public class ConnectorTests
 
         var cities = connector.Query<City>("select id, name as nom from cities where state = 'TX'");
 
-        Assert.AreEqual("Houston", cities.First().Name);
+        Assert.That(cities.First().Name, Is.EqualTo("Houston"));
     }
 
     [Test]
     public void NullParameterValuesAreConvertedToDbNull()
     {
         var p = connector.ObjectFactory.CreateParameter("@test", null);
-        Assert.AreEqual(DBNull.Value, p.Value);
+        Assert.That(p.Value, Is.EqualTo(DBNull.Value));
     }
 
     [Test]
@@ -129,7 +150,7 @@ public class ConnectorTests
     {
         // Check initial state
         int count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-        Assert.AreEqual(0, count);
+        Assert.That(count, Is.EqualTo(0));
 
         // Load the table and add a row
         var cities = connector.QueryTable("select * from cities");
@@ -147,7 +168,7 @@ public class ConnectorTests
         // Verify that the row was added
         var flCities = connector.QueryTable("select * from cities where state = 'FL'");
         flCities.TableName = "cities";
-        Assert.AreEqual(1, flCities.Rows.Count);
+        Assert.That(flCities.Rows, Has.Count.EqualTo(1));
 
         // Restore test data state to starting point
         flCities.Rows[0].Delete();
@@ -155,6 +176,6 @@ public class ConnectorTests
 
         // Verify that we're back to our starting point
         count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-        Assert.AreEqual(0, count);
+        Assert.That(count, Is.EqualTo(0));
     }
 }

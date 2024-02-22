@@ -13,8 +13,11 @@ public class PropertyMapperShould_WhenCreatingRecords
 
         var inst = mapper.CreateInstance(record);
 
-        Assert.That(inst.Name, Is.EqualTo("Moe"));
-        Assert.That(inst.Age, Is.EqualTo(31));
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Name, Is.EqualTo("Moe"));
+            Assert.That(inst.Age, Is.EqualTo(31));
+        });
     }
 
     [Test]
@@ -25,8 +28,11 @@ public class PropertyMapperShould_WhenCreatingRecords
 
         var inst = mapper.CreateInstance(record);
 
-        Assert.That(inst.Name, Is.EqualTo("Larry"));
-        Assert.That(inst.Age, Is.EqualTo(34));
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Name, Is.EqualTo("Larry"));
+            Assert.That(inst.Age, Is.EqualTo(34));
+        });
     }
 
     [Test]
@@ -37,8 +43,11 @@ public class PropertyMapperShould_WhenCreatingRecords
 
         var inst = mapper.CreateInstance(record);
 
-        Assert.That(inst.Name, Is.EqualTo("Curly"));
-        Assert.That(inst.Age, Is.EqualTo(28));
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Name, Is.EqualTo("Curly"));
+            Assert.That(inst.Age, Is.EqualTo(28));
+        });
     }
 
     record RequiredRecord(string Name, int Age);

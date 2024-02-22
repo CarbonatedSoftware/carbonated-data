@@ -16,294 +16,409 @@ public class QueryScalarTests
         db = new SqlServerDbConnector(TestConnectionString);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        db.Dispose();
+    }
+
+
     private string Select(string field, int id) => $"select [{field}] from type_test where id = {id}";
 
     [Test]
     public void QueryScalarBool()
     {
-        Assert.IsFalse(db.QueryScalar<bool>(Select("bool", 1)));
-        Assert.IsFalse(db.QueryScalar<bool>(Select("bool", 2)));
-        Assert.IsTrue(db.QueryScalar<bool>(Select("bool", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<bool>(Select("bool", 1)), Is.False);
+            Assert.That(db.QueryScalar<bool>(Select("bool", 2)), Is.False);
+            Assert.That(db.QueryScalar<bool>(Select("bool", 3)), Is.True);
+        });
     }
 
     [Test]
     public void QueryScalarByte()
     {
-        Assert.AreEqual(0, db.QueryScalar<byte>(Select("byte", 1)));
-        Assert.AreEqual(0, db.QueryScalar<byte>(Select("byte", 2)));
-        Assert.AreEqual(1, db.QueryScalar<byte>(Select("byte", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<byte>(Select("byte", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<byte>(Select("byte", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<byte>(Select("byte", 3)), Is.EqualTo(1));
+        });
     }
 
     [Test]
     public void QueryScalarShort()
     {
-        Assert.AreEqual(0, db.QueryScalar<short>(Select("short", 1)));
-        Assert.AreEqual(0, db.QueryScalar<short>(Select("short", 2)));
-        Assert.AreEqual(2, db.QueryScalar<short>(Select("short", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<short>(Select("short", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<short>(Select("short", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<short>(Select("short", 3)), Is.EqualTo(2));
+        });
     }
 
     [Test]
     public void QueryScalarInt()
     {
-        Assert.AreEqual(0, db.QueryScalar<int>(Select("int", 1)));
-        Assert.AreEqual(0, db.QueryScalar<int>(Select("int", 2)));
-        Assert.AreEqual(3, db.QueryScalar<int>(Select("int", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<int>(Select("int", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<int>(Select("int", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<int>(Select("int", 3)), Is.EqualTo(3));
+        });
     }
 
     [Test]
     public void QueryScalarLong()
     {
-        Assert.AreEqual(0, db.QueryScalar<long>(Select("long", 1)));
-        Assert.AreEqual(0, db.QueryScalar<long>(Select("long", 2)));
-        Assert.AreEqual(5, db.QueryScalar<long>(Select("long", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<long>(Select("long", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<long>(Select("long", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<long>(Select("long", 3)), Is.EqualTo(5));
+        });
     }
 
     [Test]
     public void QueryScalarFloat()
     {
-        Assert.AreEqual(0, db.QueryScalar<float>(Select("float", 1)));
-        Assert.AreEqual(0, db.QueryScalar<float>(Select("float", 2)));
-        Assert.AreEqual(8.13f, db.QueryScalar<float>(Select("float", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<float>(Select("float", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<float>(Select("float", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<float>(Select("float", 3)), Is.EqualTo(8.13f));
+        });
     }
 
     [Test]
     public void QueryScalarDouble()
     {
-        Assert.AreEqual(0, db.QueryScalar<double>(Select("double", 1)));
-        Assert.AreEqual(0, db.QueryScalar<double>(Select("double", 2)));
-        Assert.AreEqual(21.34, db.QueryScalar<double>(Select("double", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<double>(Select("double", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<double>(Select("double", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<double>(Select("double", 3)), Is.EqualTo(21.34));
+        });
     }
 
     [Test]
     public void QueryScalarDecimal()
     {
-        Assert.AreEqual(0, db.QueryScalar<decimal>(Select("decimal", 1)));
-        Assert.AreEqual(0, db.QueryScalar<decimal>(Select("decimal", 2)));
-        Assert.AreEqual(55.89m, db.QueryScalar<decimal>(Select("decimal", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<decimal>(Select("decimal", 1)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<decimal>(Select("decimal", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<decimal>(Select("decimal", 3)), Is.EqualTo(55.89m));
+        });
     }
 
     [Test]
     public void QueryScalarDateTime()
     {
-        Assert.AreEqual(DateTime.MinValue, db.QueryScalar<DateTime>(Select("DateTime", 1)));
-        Assert.AreEqual(new DateTime(1753, 1, 1, 0, 0, 0), db.QueryScalar<DateTime>(Select("DateTime", 2)));
-        Assert.AreEqual(new DateTime(2018, 4, 2, 13, 14, 15), db.QueryScalar<DateTime>(Select("DateTime", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<DateTime>(Select("DateTime", 1)), Is.EqualTo(DateTime.MinValue));
+            Assert.That(db.QueryScalar<DateTime>(Select("DateTime", 2)), Is.EqualTo(new DateTime(1753, 1, 1, 0, 0, 0)));
+            Assert.That(db.QueryScalar<DateTime>(Select("DateTime", 3)), Is.EqualTo(new DateTime(2018, 4, 2, 13, 14, 15)));
+        });
     }
 
     [Test]
     public void QueryScalarDateTimeStoredAsDateTime2()
     {
-        Assert.AreEqual(DateTime.MinValue, db.QueryScalar<DateTime>(Select("DateTime2", 1)));
-        Assert.AreEqual(DateTime.MinValue, db.QueryScalar<DateTime>(Select("DateTime2", 2)));
-        Assert.AreEqual(new DateTime(2023, 8, 11, 14, 9, 15), db.QueryScalar<DateTime>(Select("DateTime2", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<DateTime>(Select("DateTime2", 1)), Is.EqualTo(DateTime.MinValue));
+            Assert.That(db.QueryScalar<DateTime>(Select("DateTime2", 2)), Is.EqualTo(DateTime.MinValue));
+            Assert.That(db.QueryScalar<DateTime>(Select("DateTime2", 3)), Is.EqualTo(new DateTime(2023, 8, 11, 14, 9, 15)));
+        });
     }
 
     [Test]
     public void QueryScalarDateOnly()
     {
-        Assert.AreEqual(DateOnly.MinValue, db.QueryScalar<DateOnly>(Select("Date", 1)));
-        Assert.AreEqual(DateOnly.MinValue, db.QueryScalar<DateOnly>(Select("Date", 2)));
-        Assert.AreEqual(new DateOnly(2023, 8, 11), db.QueryScalar<DateOnly>(Select("Date", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<DateOnly>(Select("Date", 1)), Is.EqualTo(DateOnly.MinValue));
+            Assert.That(db.QueryScalar<DateOnly>(Select("Date", 2)), Is.EqualTo(DateOnly.MinValue));
+            Assert.That(db.QueryScalar<DateOnly>(Select("Date", 3)), Is.EqualTo(new DateOnly(2023, 8, 11)));
+        });
     }
 
     [Test]
     public void QueryScalarTimeOnly()
     {
-        Assert.AreEqual(TimeOnly.MinValue, db.QueryScalar<TimeOnly>(Select("Time", 1)));
-        Assert.AreEqual(TimeOnly.MinValue, db.QueryScalar<TimeOnly>(Select("Time", 2)));
-        Assert.AreEqual(new TimeOnly(14, 9, 15), db.QueryScalar<TimeOnly>(Select("Time", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<TimeOnly>(Select("Time", 1)), Is.EqualTo(TimeOnly.MinValue));
+            Assert.That(db.QueryScalar<TimeOnly>(Select("Time", 2)), Is.EqualTo(TimeOnly.MinValue));
+            Assert.That(db.QueryScalar<TimeOnly>(Select("Time", 3)), Is.EqualTo(new TimeOnly(14, 9, 15)));
+        });
     }
 
     [Test]
     public void QueryScalarGuidStoredAsString()
     {
-        Assert.AreEqual(Guid.Empty, db.QueryScalar<Guid>(Select("guid_as_string", 1)));
-        Assert.AreEqual(Guid.Empty, db.QueryScalar<Guid>(Select("guid_as_string", 2)));
-        Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), db.QueryScalar<Guid>(Select("guid_as_string", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Guid>(Select("guid_as_string", 1)), Is.EqualTo(Guid.Empty));
+            Assert.That(db.QueryScalar<Guid>(Select("guid_as_string", 2)), Is.EqualTo(Guid.Empty));
+            Assert.That(db.QueryScalar<Guid>(Select("guid_as_string", 3)), Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
+        });
     }
 
     [Test]
     public void QueryScalarGuidStoredAsUniqueIdentifier()
     {
-        Assert.AreEqual(Guid.Empty, db.QueryScalar<Guid>(Select("guid_as_uniqueid", 1)));
-        Assert.AreEqual(Guid.Empty, db.QueryScalar<Guid>(Select("guid_as_uniqueid", 2)));
-        Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), db.QueryScalar<Guid>(Select("guid_as_uniqueid", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Guid>(Select("guid_as_uniqueid", 1)), Is.EqualTo(Guid.Empty));
+            Assert.That(db.QueryScalar<Guid>(Select("guid_as_uniqueid", 2)), Is.EqualTo(Guid.Empty));
+            Assert.That(db.QueryScalar<Guid>(Select("guid_as_uniqueid", 3)), Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
+        });
     }
 
     [Test]
     public void QueryScalarChar()
     {
-        Assert.AreEqual('\0', db.QueryScalar<char>(Select("char", 1)));
-        Assert.AreEqual('\0', db.QueryScalar<char>(Select("char", 2)));
-        Assert.AreEqual('c', db.QueryScalar<char>(Select("char", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<char>(Select("char", 1)), Is.EqualTo('\0'));
+            Assert.That(db.QueryScalar<char>(Select("char", 2)), Is.EqualTo('\0'));
+            Assert.That(db.QueryScalar<char>(Select("char", 3)), Is.EqualTo('c'));
+        });
     }
 
     [Test]
     public void QueryScalarString()
     {
-        Assert.AreEqual(null, db.QueryScalar<string>(Select("string", 1)));
-        Assert.AreEqual("", db.QueryScalar<string>(Select("string", 2)));
-        Assert.AreEqual("str", db.QueryScalar<string>(Select("string", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<string>(Select("string", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<string>(Select("string", 2)), Is.EqualTo(""));
+            Assert.That(db.QueryScalar<string>(Select("string", 3)), Is.EqualTo("str"));
+        });
     }
 
     [Test]
     public void QueryScalarByteArray()
     {
-        Assert.AreEqual(null, db.QueryScalar<byte[]>(Select("byte_array", 1)));
-        Assert.AreEqual(null, db.QueryScalar<byte[]>(Select("byte_array", 2)));
-        Assert.AreEqual(new byte[] { 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 }, db.QueryScalar<byte[]>(Select("byte_array", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 3)), Is.EqualTo(new byte[] { 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 }));
+        });
     }
 
     [Test]
     public void QueryScalarIntEnum()
     {
-        Assert.AreEqual(Numbers.Zero, db.QueryScalar<Numbers>(Select("int_enum", 1)));
-        Assert.AreEqual(Numbers.Zero, db.QueryScalar<Numbers>(Select("int_enum", 2)));
-        Assert.AreEqual(Numbers.Three, db.QueryScalar<Numbers>(Select("int_enum", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Numbers>(Select("int_enum", 1)), Is.EqualTo(Numbers.Zero));
+            Assert.That(db.QueryScalar<Numbers>(Select("int_enum", 2)), Is.EqualTo(Numbers.Zero));
+            Assert.That(db.QueryScalar<Numbers>(Select("int_enum", 3)), Is.EqualTo(Numbers.Three));
+        });
     }
 
     [Test]
     public void QueryScalarStringEnum()
     {
-        Assert.AreEqual(Colors.Red, db.QueryScalar<Colors>(Select("string_enum", 1)));
-        Assert.AreEqual(Colors.Red, db.QueryScalar<Colors>(Select("string_enum", 2)));
-        Assert.AreEqual(Colors.Green, db.QueryScalar<Colors>(Select("string_enum", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Colors>(Select("string_enum", 1)), Is.EqualTo(Colors.Red));
+            Assert.That(db.QueryScalar<Colors>(Select("string_enum", 2)), Is.EqualTo(Colors.Red));
+            Assert.That(db.QueryScalar<Colors>(Select("string_enum", 3)), Is.EqualTo(Colors.Green));
+        });
     }
 
     [Test]
     public void QueryScalarNullableBool()
     {
-        Assert.IsNull(db.QueryScalar<bool?>(Select("bool", 1)));
-        Assert.IsFalse(db.QueryScalar<bool?>(Select("bool", 2)));
-        Assert.IsTrue(db.QueryScalar<bool?>(Select("bool", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<bool?>(Select("bool", 1)), Is.Null);
+            Assert.That(db.QueryScalar<bool?>(Select("bool", 2)), Is.False);
+            Assert.That(db.QueryScalar<bool?>(Select("bool", 3)), Is.True);
+        });
     }
 
     [Test]
     public void QueryScalarNullableByte()
     {
-        Assert.AreEqual(null, db.QueryScalar<byte?>(Select("byte", 1)));
-        Assert.AreEqual(0, db.QueryScalar<byte?>(Select("byte", 2)));
-        Assert.AreEqual(1, db.QueryScalar<byte?>(Select("byte", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<byte?>(Select("byte", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<byte?>(Select("byte", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<byte?>(Select("byte", 3)), Is.EqualTo(1));
+        });
     }
 
     [Test]
     public void QueryScalarNullableShort()
     {
-        Assert.AreEqual(null, db.QueryScalar<short?>(Select("short", 1)));
-        Assert.AreEqual(0, db.QueryScalar<short?>(Select("short", 2)));
-        Assert.AreEqual(2, db.QueryScalar<short?>(Select("short", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<short?>(Select("short", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<short?>(Select("short", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<short?>(Select("short", 3)), Is.EqualTo(2));
+        });
     }
 
     [Test]
     public void QueryScalarNullableInt()
     {
-        Assert.AreEqual(null, db.QueryScalar<int?>(Select("int", 1)));
-        Assert.AreEqual(0, db.QueryScalar<int?>(Select("int", 2)));
-        Assert.AreEqual(3, db.QueryScalar<int?>(Select("int", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<int?>(Select("int", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<int?>(Select("int", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<int?>(Select("int", 3)), Is.EqualTo(3));
+        });
     }
 
     [Test]
     public void QueryScalarNullableLong()
     {
-        Assert.AreEqual(null, db.QueryScalar<long?>(Select("long", 1)));
-        Assert.AreEqual(0, db.QueryScalar<long?>(Select("long", 2)));
-        Assert.AreEqual(5, db.QueryScalar<long?>(Select("long", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<long?>(Select("long", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<long?>(Select("long", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<long?>(Select("long", 3)), Is.EqualTo(5));
+        });
     }
 
     [Test]
     public void QueryScalarNullableFloat()
     {
-        Assert.AreEqual(null, db.QueryScalar<float?>(Select("float", 1)));
-        Assert.AreEqual(0, db.QueryScalar<float?>(Select("float", 2)));
-        Assert.AreEqual(8.13f, db.QueryScalar<float?>(Select("float", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<float?>(Select("float", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<float?>(Select("float", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<float?>(Select("float", 3)), Is.EqualTo(8.13f));
+        });
     }
 
     [Test]
     public void QueryScalarNullableDouble()
     {
-        Assert.AreEqual(null, db.QueryScalar<double?>(Select("double", 1)));
-        Assert.AreEqual(0, db.QueryScalar<double?>(Select("double", 2)));
-        Assert.AreEqual(21.34, db.QueryScalar<double?>(Select("double", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<double?>(Select("double", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<double?>(Select("double", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<double?>(Select("double", 3)), Is.EqualTo(21.34));
+        });
     }
 
     [Test]
     public void QueryScalarNullableDecimal()
     {
-        Assert.AreEqual(null, db.QueryScalar<decimal?>(Select("decimal", 1)));
-        Assert.AreEqual(0, db.QueryScalar<decimal?>(Select("decimal", 2)));
-        Assert.AreEqual(55.89m, db.QueryScalar<decimal?>(Select("decimal", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 3)), Is.EqualTo(55.89m));
+        });
     }
 
     [Test]
     public void QueryScalarNullableDateTime()
     {
-        Assert.AreEqual(null, db.QueryScalar<DateTime?>(Select("DateTime", 1)));
-        Assert.AreEqual(new DateTime(1753, 1, 1, 0, 0, 0), db.QueryScalar<DateTime?>(Select("DateTime", 2)));
-        Assert.AreEqual(new DateTime(2018, 4, 2, 13, 14, 15), db.QueryScalar<DateTime?>(Select("DateTime", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 2)), Is.EqualTo(new DateTime(1753, 1, 1, 0, 0, 0)));
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 3)), Is.EqualTo(new DateTime(2018, 4, 2, 13, 14, 15)));
+        });
     }
 
     [Test]
     public void QueryScalarNullableDateTimeStoredAsDateTime2()
     {
-        Assert.AreEqual(null, db.QueryScalar<DateTime?>(Select("DateTime2", 1)));
-        Assert.AreEqual(DateTime.MinValue, db.QueryScalar<DateTime?>(Select("DateTime2", 2)));
-        Assert.AreEqual(new DateTime(2023, 8, 11, 14, 9, 15), db.QueryScalar<DateTime?>(Select("DateTime2", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 2)), Is.EqualTo(DateTime.MinValue));
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 3)), Is.EqualTo(new DateTime(2023, 8, 11, 14, 9, 15)));
+        });
     }
 
     [Test]
     public void QueryScalarNullableDateOnly()
     {
-        Assert.AreEqual(null, db.QueryScalar<DateOnly?>(Select("Date", 1)));
-        Assert.AreEqual(DateOnly.MinValue, db.QueryScalar<DateOnly?>(Select("Date", 2)));
-        Assert.AreEqual(new DateOnly(2023, 8, 11), db.QueryScalar<DateOnly?>(Select("Date", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 2)), Is.EqualTo(DateOnly.MinValue));
+            Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 3)), Is.EqualTo(new DateOnly(2023, 8, 11)));
+        });
     }
 
     [Test]
     public void QueryScalarNullableTimeOnly()
     {
-        Assert.AreEqual(null, db.QueryScalar<TimeOnly?>(Select("Time", 1)));
-        Assert.AreEqual(TimeOnly.MinValue, db.QueryScalar<TimeOnly?>(Select("Time", 2)));
-        Assert.AreEqual(new TimeOnly(14, 9, 15), db.QueryScalar<TimeOnly?>(Select("Time", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 2)), Is.EqualTo(TimeOnly.MinValue));
+            Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 3)), Is.EqualTo(new TimeOnly(14, 9, 15)));
+        });
     }
 
     [Test]
     public void QueryScalarNullableGuidStoredAsString()
     {
-        Assert.AreEqual(null, db.QueryScalar<Guid?>(Select("guid_as_string", 1)));
-        Assert.AreEqual(null, db.QueryScalar<Guid?>(Select("guid_as_string", 2)));
-        Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), db.QueryScalar<Guid?>(Select("guid_as_string", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 3)), Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
+        });
     }
 
     [Test]
     public void QueryScalarNullableGuidStoredAsUniqueIdentifier()
     {
-        Assert.AreEqual(null, db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 1)));
-        Assert.AreEqual(null, db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 2)));
-        Assert.AreEqual(new Guid("7ca43d156e8749dfbaffdb241d0d494c"), db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 3)), Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
+        });
     }
 
     [Test]
     public void QueryScalarNullableChar()
     {
-        Assert.AreEqual(null, db.QueryScalar<char?>(Select("char", 1)));
-        Assert.AreEqual(null, db.QueryScalar<char?>(Select("char", 2)));
-        Assert.AreEqual('c', db.QueryScalar<char?>(Select("char", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<char?>(Select("char", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<char?>(Select("char", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<char?>(Select("char", 3)), Is.EqualTo('c'));
+        });
     }
 
     [Test]
     public void QueryScalarNullableIntEnum()
     {
-        Assert.AreEqual(null, db.QueryScalar<Numbers?>(Select("int_enum", 1)));
-        Assert.AreEqual(Numbers.Zero, db.QueryScalar<Numbers?>(Select("int_enum", 2)));
-        Assert.AreEqual(Numbers.Three, db.QueryScalar<Numbers?>(Select("int_enum", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 2)), Is.EqualTo(Numbers.Zero));
+            Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 3)), Is.EqualTo(Numbers.Three));
+        });
     }
 
     [Test]
     public void QueryScalarNullableStringEnum()
     {
-        Assert.AreEqual(null, db.QueryScalar<Colors?>(Select("string_enum", 1)));
-        Assert.AreEqual(null, db.QueryScalar<Colors?>(Select("string_enum", 2)));
-        Assert.AreEqual(Colors.Green, db.QueryScalar<Colors?>(Select("string_enum", 3)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 3)), Is.EqualTo(Colors.Green));
+        });
     }
 
     [Test]
@@ -313,7 +428,7 @@ public class QueryScalarTests
 
         var result = db.QueryScalar<SemanticInt>(Select("int", 3));
 
-        Assert.AreEqual(3, result.Value);
+        Assert.That(result.Value, Is.EqualTo(3));
     }
 
     class SemanticInt

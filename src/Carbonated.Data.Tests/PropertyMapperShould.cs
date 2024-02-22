@@ -16,7 +16,7 @@ public class PropertyMapperShould
     {
         var mapper = PropMapper<Entity>();
 
-        CollectionAssert.AreEqual(Strings("Id", "Name", "Title"), mapper.Mappings.Select(m => m.Field));
+        Assert.That(mapper.Mappings.Select(m => m.Field), Is.EqualTo(Strings("Id", "Name", "Title")).AsCollection);
     }
 
     [Test]
@@ -26,8 +26,8 @@ public class PropertyMapperShould
             .Map(x => x.Name, "nom");
 
         var fields = mapper.Mappings.Select(m => m.Field);
-        CollectionAssert.DoesNotContain(fields, "Name");
-        CollectionAssert.Contains(fields, "nom");
+        Assert.That(fields, Has.No.Member("Name"));
+        Assert.That(fields, Has.Member("nom"));
     }
 
     [Test]
@@ -35,8 +35,8 @@ public class PropertyMapperShould
     {
         var mapper = PropMapper<Entity>();
 
-        var ex = Assert.Throws<MappingException>(() => mapper.Map(x => x.Name, "Title"));
-        StringAssert.StartsWith("Field cannot be mapped to more than one property", ex.Message);
+        Assert.That(() => mapper.Map(x => x.Name, "Title"), Throws.InstanceOf<MappingException>()
+            .With.Message.StartsWith("Field cannot be mapped to more than one property"));
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class PropertyMapperShould
     {
         var mapper = PropMapper<Entity>();
 
-        Assert.IsTrue(mapper.Mappings.All(m => m.Condition == PopulationCondition.Optional));
+        Assert.That(mapper.Mappings.All(m => m.Condition == PopulationCondition.Optional), Is.True);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class PropertyMapperShould
     {
         var mapper = PropMapper<Entity>(PopulationCondition.Required);
 
-        Assert.IsTrue(mapper.Mappings.All(m => m.Condition == PopulationCondition.Required));
+        Assert.That(mapper.Mappings.All(m => m.Condition == PopulationCondition.Required), Is.True);
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>()
             .Ignore(x => x.Title);
 
-        Assert.IsTrue(mapper.Mappings.Single(m => m.Property.Name == "Title").IsIgnored);
+        Assert.That(mapper.Mappings.Single(m => m.Property.Name == "Title").IsIgnored, Is.True);
     }
 
     [Test]
@@ -76,9 +76,12 @@ public class PropertyMapperShould
         var nameMap = mapper.Mappings.Single(m => m.Property.Name == "Name");
         var titleMap = mapper.Mappings.Single(m => m.Property.Name == "Title");
 
-        Assert.AreEqual(PopulationCondition.NotNull, idMap.Condition);
-        Assert.AreEqual(PopulationCondition.Optional, nameMap.Condition);
-        Assert.AreEqual(PopulationCondition.Optional, titleMap.Condition);
+        Assert.Multiple(() =>
+        {
+            Assert.That(idMap.Condition, Is.EqualTo(PopulationCondition.NotNull));
+            Assert.That(nameMap.Condition, Is.EqualTo(PopulationCondition.Optional));
+            Assert.That(titleMap.Condition, Is.EqualTo(PopulationCondition.Optional));
+        });
     }
 
     [Test]
@@ -87,7 +90,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>(PopulationCondition.Required)
             .Map(x => x.Name, "nom");
 
-        Assert.AreEqual(PopulationCondition.Required, mapper.Mappings.Single(m => m.Property.Name == "Name").Condition);
+        Assert.That(mapper.Mappings.Single(m => m.Property.Name == "Name").Condition, Is.EqualTo(PopulationCondition.Required));
     }
 
     [Test]
@@ -98,7 +101,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>()
             .Map(x => x.Id, "id", customConverter);
 
-        Assert.AreSame(customConverter, mapper.Mappings.Single(m => m.Property.Name == "Id").FromDbConverter);
+        Assert.That(mapper.Mappings.Single(m => m.Property.Name == "Id").FromDbConverter, Is.SameAs(customConverter));
     }
 
     [Test]
@@ -109,7 +112,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>()
             .AfterBinding(action);
 
-        Assert.AreSame(action, mapper.AfterBindAction);
+        Assert.That(mapper.AfterBindAction, Is.SameAs(action));
     }
 
     #region Instance activation and population
@@ -122,7 +125,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", "Tester")));
     }
 
     [Test]
@@ -135,7 +138,7 @@ public class PropertyMapperShould
             .Map(x => x.Title, "role");
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", "Tester")));
     }
 
     [Test]
@@ -147,7 +150,7 @@ public class PropertyMapperShould
             .Map(x => x.Id, "id", v => v.ToString() == "ten" ? 10 : 0);
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", "Tester")));
     }
 
     [Test]
@@ -159,7 +162,7 @@ public class PropertyMapperShould
             .AfterBinding((r, e) => e.Title = "override");
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", "override"), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", "override")));
     }
 
     [Test]
@@ -171,7 +174,7 @@ public class PropertyMapperShould
             .Ignore(x => x.Title);
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", null), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", null)));
     }
 
     [Test]
@@ -183,7 +186,7 @@ public class PropertyMapperShould
             .IgnoreOnLoad(x => x.Title);
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", null), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", null)));
     }
 
     [Test]
@@ -195,7 +198,7 @@ public class PropertyMapperShould
             .IgnoreOnSave(x => x.Title);
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", "Tester")));
     }
 
     [Test]
@@ -206,7 +209,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(new Entity(10, "John Q", "Tester"), inst);
+        Assert.That(inst, Is.EqualTo(new Entity(10, "John Q", "Tester")));
     }
 
     [Test]
@@ -217,7 +220,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<NonNormalEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(50, inst.Entity_Id);
+        Assert.That(inst.Entity_Id, Is.EqualTo(50));
     }
 
     [Test]
@@ -228,8 +231,11 @@ public class PropertyMapperShould
         var mapper = PropMapper<IntDateEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(0, inst.IntProp);
-        Assert.AreEqual(DateTime.MinValue, inst.DateProp);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.IntProp, Is.EqualTo(0));
+            Assert.That(inst.DateProp, Is.EqualTo(DateTime.MinValue));
+        });
     }
 
     [Test]
@@ -240,8 +246,11 @@ public class PropertyMapperShould
         var mapper = PropMapper<NullableIntDateEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.IsNull(inst.IntProp);
-        Assert.IsNull(inst.DateProp);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.IntProp, Is.Null);
+            Assert.That(inst.DateProp, Is.Null);
+        });
     }
 
     [Test]
@@ -252,10 +261,13 @@ public class PropertyMapperShould
         var mapper = PropMapper<EnumEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(EnumEntity.Colors.Blue, inst.Color);
-        Assert.AreEqual(EnumEntity.Shapes.Square, inst.Shape);
-        Assert.AreEqual(EnumEntity.Colors.Red, inst.OtherColor);
-        Assert.AreEqual(EnumEntity.Shapes.Circle, inst.OtherShape);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Color, Is.EqualTo(EnumEntity.Colors.Blue));
+            Assert.That(inst.Shape, Is.EqualTo(EnumEntity.Shapes.Square));
+            Assert.That(inst.OtherColor, Is.EqualTo(EnumEntity.Colors.Red));
+            Assert.That(inst.OtherShape, Is.EqualTo(EnumEntity.Shapes.Circle));
+        });
     }
 
     [Test]
@@ -266,8 +278,8 @@ public class PropertyMapperShould
 
         var mapper = PropMapper<EnumEntity>();
 
-        Assert.Throws<BindingException>(() => mapper.CreateInstance(record1));
-        Assert.Throws<BindingException>(() => mapper.CreateInstance(record2));
+        Assert.That(() => mapper.CreateInstance(record1), Throws.TypeOf<BindingException>());
+        Assert.That(() => mapper.CreateInstance(record2), Throws.TypeOf<BindingException>());
     }
 
     [Test]
@@ -278,9 +290,12 @@ public class PropertyMapperShould
         var mapper = PropMapper<GuidEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(Guid.Empty, inst.Foo);
-        Assert.AreEqual(Guid.Empty, inst.Bar);
-        Assert.AreEqual(new Guid("10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"), inst.Baz);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Foo, Is.EqualTo(Guid.Empty));
+            Assert.That(inst.Bar, Is.EqualTo(Guid.Empty));
+            Assert.That(inst.Baz, Is.EqualTo(new Guid("10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC")));
+        });
     }
 
     [Test]
@@ -291,9 +306,12 @@ public class PropertyMapperShould
         var mapper = PropMapper<NullableGuidEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.IsNull(inst.Foo);
-        Assert.IsNull(inst.Bar);
-        Assert.AreEqual(new Guid("10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC"), inst.Baz);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Foo, Is.Null);
+            Assert.That(inst.Bar, Is.Null);
+            Assert.That(inst.Baz, Is.EqualTo(new Guid("10DB5BD9-A8CC-46E2-A5EB-791460B0B1CC")));
+        });
     }
 
     [Test]
@@ -303,7 +321,7 @@ public class PropertyMapperShould
 
         var mapper = PropMapper<GuidEntity>();
 
-        Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
+        Assert.That(() => mapper.CreateInstance(record), Throws.TypeOf<BindingException>());
     }
 
     [Test]
@@ -314,7 +332,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<CharEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(default(char), inst.CharProp);
+        Assert.That(inst.CharProp, Is.EqualTo(default(char)));
     }
 
     [Test]
@@ -325,9 +343,12 @@ public class PropertyMapperShould
         var mapper = PropMapper<ValueEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(42, inst.IntProp);
-        Assert.AreEqual(new DateTime(2018, 4, 2, 8, 30, 1), inst.DateProp);
-        Assert.AreEqual(3.14m, inst.DecimalProp);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.IntProp, Is.EqualTo(42));
+            Assert.That(inst.DateProp, Is.EqualTo(new DateTime(2018, 4, 2, 8, 30, 1)));
+            Assert.That(inst.DecimalProp, Is.EqualTo(3.14m));
+        });
     }
 
     [Test]
@@ -338,8 +359,11 @@ public class PropertyMapperShould
         var mapper = PropMapper<JsonEntity>();
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(inst.IntDateProp.IntProp, 5);
-        Assert.AreEqual(inst.IntDateProp.DateProp, new DateTime(2016, 1, 1, 16, 15, 0));
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.IntDateProp.IntProp, Is.EqualTo(5));
+            Assert.That(inst.IntDateProp.DateProp, Is.EqualTo(new DateTime(2016, 1, 1, 16, 15, 0)));
+        });
     }
 
     [Test]
@@ -354,14 +378,17 @@ public class PropertyMapperShould
         var inst2 = mapper.CreateInstance(record2);
         var inst3 = mapper.CreateInstance(record3);
 
-        CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, inst1.Numbers);
-        CollectionAssert.AreEqual(Strings("foo", "bar"), inst1.Strings);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst1.Numbers, Is.EqualTo(new int[] { 1, 2, 3, 4 }).AsCollection);
+            Assert.That(inst1.Strings, Is.EqualTo(Strings("foo", "bar")).AsCollection);
 
-        Assert.AreEqual(0, inst2.Numbers.Length);
-        Assert.AreEqual(0, inst2.Strings.Count());
+            Assert.That(inst2.Numbers, Is.Empty);
+            Assert.That(inst2.Strings.Count(), Is.EqualTo(0));
 
-        Assert.IsNull(inst3.Numbers);
-        Assert.IsNull(inst3.Strings);
+            Assert.That(inst3.Numbers, Is.Null);
+            Assert.That(inst3.Strings, Is.Null);
+        });
     }
 
     [Test]
@@ -372,7 +399,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>()
             .Required(x => x.Name);
 
-        Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
+        Assert.That(() => mapper.CreateInstance(record), Throws.TypeOf<BindingException>());
     }
 
     [Test]
@@ -383,7 +410,7 @@ public class PropertyMapperShould
         var mapper = PropMapper<Entity>()
             .NotNull(x => x.Name);
 
-        Assert.Throws<BindingException>(() => mapper.CreateInstance(record));
+        Assert.That(() => mapper.CreateInstance(record), Throws.TypeOf<BindingException>());
     }
 
     [Test]
@@ -398,7 +425,7 @@ public class PropertyMapperShould
 
         var inst = mapper.CreateInstance(record);
 
-        Assert.AreEqual(86, inst.AgentNumber.Value);
+        Assert.That(inst.AgentNumber.Value, Is.EqualTo(86));
     }
 
     #endregion
