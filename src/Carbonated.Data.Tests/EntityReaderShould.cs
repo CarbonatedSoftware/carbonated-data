@@ -20,7 +20,7 @@ public class EntityReaderShould
 
         var inst = reader.First();
 
-        Assert.AreEqual(3, inst.Id);
+        Assert.That(inst.Id, Is.EqualTo(3));
     }
 
     [Test]
@@ -37,8 +37,11 @@ public class EntityReaderShould
         var reader = new EntityReader<Entity>(dataReader, mapper);
         var items = reader.Take(2).ToList();
 
-        Assert.AreEqual("John Q", items[0].Name);
-        Assert.AreEqual("Jane R", items[1].Name);
+        Assert.Multiple(() =>
+        {
+            Assert.That(items[0].Name, Is.EqualTo("John Q"));
+            Assert.That(items[1].Name, Is.EqualTo("Jane R"));
+        });
     }
 
     [Test]
@@ -55,8 +58,11 @@ public class EntityReaderShould
         var reader = new EntityReader<EntityWithSemanticProperty>(dataReader, mapper);
         var items = reader.ToList();
 
-        Assert.AreEqual(42, items[0].Id);
-        Assert.AreEqual(86, items[0].AgentNumber.Value);
+        Assert.Multiple(() =>
+        {
+            Assert.That(items[0].Id, Is.EqualTo(42));
+            Assert.That(items[0].AgentNumber.Value, Is.EqualTo(86));
+        });
     }
 
     [Test]
@@ -72,10 +78,10 @@ public class EntityReaderShould
 
         var reader = new EntityReader<Entity>(dataReader, mapper);
 
-        Assert.IsFalse(dataReader.IsClosed);
+        Assert.That(dataReader.IsClosed, Is.False);
 
         var items = reader.ToList();
 
-        Assert.IsTrue(dataReader.IsClosed);
+        Assert.That(dataReader.IsClosed, Is.True);
     }
 }

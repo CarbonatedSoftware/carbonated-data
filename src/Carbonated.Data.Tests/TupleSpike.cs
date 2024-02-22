@@ -21,8 +21,11 @@ public class TupleSpike
 
         var inst = reader.First();
 
-        Assert.AreEqual(1, inst.Item1);
-        Assert.AreEqual("John", inst.Item2);
+        Assert.Multiple(() =>
+        {
+            Assert.That(inst.Item1, Is.EqualTo(1));
+            Assert.That(inst.Item2, Is.EqualTo("John"));
+        });
     }
 }
 

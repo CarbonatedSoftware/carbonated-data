@@ -12,8 +12,11 @@ public class RecordShould
     {
         var record = Record(("Foo", 1));
 
-        Assert.IsTrue(record.HasField("Foo"));
-        Assert.IsFalse(record.HasField("Oof"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.HasField("Foo"), Is.True);
+            Assert.That(record.HasField("Oof"), Is.False);
+        });
     }
 
     [Test]
@@ -21,7 +24,7 @@ public class RecordShould
     {
         var record = Record(("Foo", 1));
 
-        Assert.IsTrue(record.HasField("foo"));
+        Assert.That(record.HasField("foo"), Is.True);
     }
 
     [Test]
@@ -29,8 +32,11 @@ public class RecordShould
     {
         var record = Record(("Fo_o", 1));
 
-        Assert.IsTrue(record.HasField("Fo_o"));
-        Assert.IsTrue(record.HasField("foo"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.HasField("Fo_o"), Is.True);
+            Assert.That(record.HasField("foo"), Is.True);
+        });
     }
 
     [Test]
@@ -38,8 +44,11 @@ public class RecordShould
     {
         var record = Record(("foo", 1), ("f_oo", 2));
 
-        Assert.AreEqual(1, record.GetValue("foo"));
-        Assert.AreEqual(2, record.GetValue("f_oo"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.GetValue("foo"), Is.EqualTo(1));
+            Assert.That(record.GetValue("f_oo"), Is.EqualTo(2));
+        });
     }
 
     [Test]
@@ -47,9 +56,12 @@ public class RecordShould
     {
         var record = Record(("f_oo", 1), ("fo_o", 2));
 
-        Assert.IsFalse(record.HasField("foo"));
-        Assert.AreEqual(1, record.GetValue("f_oo"));
-        Assert.AreEqual(2, record.GetValue("fo_o"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.HasField("foo"), Is.False);
+            Assert.That(record.GetValue("f_oo"), Is.EqualTo(1));
+            Assert.That(record.GetValue("fo_o"), Is.EqualTo(2));
+        });
     }
 
     [Test]
@@ -57,7 +69,7 @@ public class RecordShould
     {
         var record = Record(("foo", 1));
 
-        Assert.AreEqual(1, record.GetValue("f_oo"));
+        Assert.That(record.GetValue("f_oo"), Is.EqualTo(1));
     }
 
     [Test]
@@ -65,7 +77,7 @@ public class RecordShould
     {
         var record = Record(("Foo", 1));
 
-        Assert.IsNull(record.GetValue("bar"));
+        Assert.That(record.GetValue("bar"), Is.Null);
     }
 
     [Test]
@@ -73,8 +85,11 @@ public class RecordShould
     {
         var record = Record(("Foo", 1));
 
-        Assert.AreEqual(0, record.GetIndex("foo"));
-        Assert.AreEqual(-1, record.GetIndex("bar"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.GetIndex("foo"), Is.EqualTo(0));
+            Assert.That(record.GetIndex("bar"), Is.EqualTo(-1));
+        });
     }
 
     [Test]
@@ -82,9 +97,12 @@ public class RecordShould
     {
         var record = Record(("bool", true), ("byte", (byte)1), ("char", 'a'));
 
-        Assert.AreEqual(true, record.GetBoolean("bool"));
-        Assert.AreEqual(1, record.GetByte("byte"));
-        Assert.AreEqual('a', record.GetChar("char"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.GetBoolean("bool"), Is.EqualTo(true));
+            Assert.That(record.GetByte("byte"), Is.EqualTo(1));
+            Assert.That(record.GetChar("char"), Is.EqualTo('a'));
+        });
     }
 
     [Test]
@@ -92,13 +110,19 @@ public class RecordShould
     {
         var record = Record(("bool1", true), ("bool2", DBNull.Value), ("dec1", 42m), ("dec2", DBNull.Value));
 
-        Assert.IsTrue(record.GetBooleanOrDefault("bool1"));
-        Assert.IsFalse(record.GetBooleanOrDefault("bool2"));
-        Assert.IsFalse(record.GetBooleanOrDefault("missing"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.GetBooleanOrDefault("bool1"), Is.True);
+            Assert.That(record.GetBooleanOrDefault("bool2"), Is.False);
+            Assert.That(record.GetBooleanOrDefault("missing"), Is.False);
+        });
 
-        Assert.AreEqual(42, record.GetDecimalOrDefault("dec1"));
-        Assert.AreEqual(0, record.GetDecimalOrDefault("dec2"));
-        Assert.AreEqual(0, record.GetDecimalOrDefault("missing"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.GetDecimalOrDefault("dec1"), Is.EqualTo(42));
+            Assert.That(record.GetDecimalOrDefault("dec2"), Is.EqualTo(0));
+            Assert.That(record.GetDecimalOrDefault("missing"), Is.EqualTo(0));
+        });
     }
 
     [Test]
@@ -106,12 +130,15 @@ public class RecordShould
     {
         var record = Record(("int1", 42), ("int2", DBNull.Value));
 
-        Assert.AreEqual(42, record.GetInt32OrDefault("int1"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(record.GetInt32OrDefault("int1"), Is.EqualTo(42));
 
-        Assert.AreEqual(0, record.GetInt32OrDefault("int2"));
-        Assert.AreEqual(76, record.GetInt32OrDefault("int2", 76));
+            Assert.That(record.GetInt32OrDefault("int2"), Is.EqualTo(0));
+            Assert.That(record.GetInt32OrDefault("int2", 76), Is.EqualTo(76));
 
-        Assert.AreEqual(0, record.GetInt32OrDefault("missing"));
-        Assert.AreEqual(99, record.GetInt32OrDefault("missing", 99));
+            Assert.That(record.GetInt32OrDefault("missing"), Is.EqualTo(0));
+            Assert.That(record.GetInt32OrDefault("missing", 99), Is.EqualTo(99));
+        });
     }
 }
