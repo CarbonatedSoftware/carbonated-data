@@ -49,6 +49,16 @@ public class MapperCollectionShould
     }
 
     [Test]
+    public void KnowWhatValueConvertersHaveBeenAdded()
+    {
+        Assert.That(mc.HasValueConverter<SemanticInt>, Is.False);
+
+        mc.AddValueConverter(x => new SemanticInt((int)x));
+
+        Assert.That(mc.HasValueConverter<SemanticInt>(), Is.True);
+    }
+
+    [Test]
     public void ThrowOnConfigureIfTypeIsAlreadyRegistered()
     {
         mc.Configure<Entity>();

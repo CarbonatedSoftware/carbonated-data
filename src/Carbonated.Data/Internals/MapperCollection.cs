@@ -33,6 +33,16 @@ public class MapperCollection
     }
 
     /// <summary>
+    /// Indicates if a value converter for the specified type has been registered.
+    /// </summary>
+    /// <typeparam name="T">The type to check for.</typeparam>
+    /// <returns>true if a converter is registered; otherwise, false.</returns>
+    public bool HasValueConverter<T>()
+    {
+        return valueConverters.ContainsKey(typeof(T));
+    }
+
+    /// <summary>
     /// Gets a custom value converter if any can be found for the specified type.
     /// </summary>
     /// <typeparam name="T">The type to convert.</typeparam>
