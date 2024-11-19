@@ -31,7 +31,11 @@ public class EntityReader<TEntity> : IEnumerable<TEntity>, IDisposable
     /// <summary>
     /// Disposes the entity reader and its underlying data reader.
     /// </summary>
-    public void Dispose() => dataReader.Dispose();
+    public void Dispose()
+    {
+        dataReader.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     /// Gets a value indicating whether the reader is closed.

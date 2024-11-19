@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Carbonated.Data;
 
@@ -25,9 +24,4 @@ public class MappingException : Exception
     /// <param name="message">The exception message.</param>
     /// <param name="innerException">The wrapped exception.</param>
     public MappingException(string message, Exception innerException) : base(message, innerException) { }
-
-    /// <summary>
-    /// Serialization constructor.
-    /// </summary>
-    protected MappingException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 }

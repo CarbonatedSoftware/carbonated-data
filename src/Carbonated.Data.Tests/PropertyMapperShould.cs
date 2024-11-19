@@ -354,7 +354,7 @@ public class PropertyMapperShould
     [Test]
     public void DeserializeJsonWhenPropertyIsComplexAndFieldIsJsonString()
     {
-        var record = Record(("IntDateProp", "{ \"IntProp\" : 5, \"DateProp\" : \"2016-01-01 16:15:00 \" }"));
+        var record = Record(("IntDateProp", "{ \"IntProp\" : 5, \"DateProp\" : \"2016-01-01 16:15:00\" }"));
 
         var mapper = PropMapper<JsonEntity>();
         var inst = mapper.CreateInstance(record);

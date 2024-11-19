@@ -11,10 +11,10 @@ namespace Carbonated.Data;
 /// </summary>
 public class Record : IDataRecord
 {
-    private static readonly Regex DisallowedChars = new Regex(@"[\W_]", RegexOptions.Compiled);
+    private static readonly Regex DisallowedChars = new(@"[\W_]", RegexOptions.Compiled);
 
     private readonly IDataReader dataReader;
-    private readonly IDictionary<string, int> fieldMappings;
+    private readonly Dictionary<string, int> fieldMappings;
 
     /// <summary>
     /// Constructs a record that wraps the specified data reader.
@@ -50,7 +50,7 @@ public class Record : IDataRecord
     /// <returns>true if the field is found; otherwise, false.</returns>
     public bool HasField(string name) => fieldMappings.ContainsKey(name);
 
-    internal int GetIndex(string name) => fieldMappings.ContainsKey(name) ? fieldMappings[name] : -1;
+    internal int GetIndex(string name) => fieldMappings.TryGetValue(name, out int index) ? index : -1;
 
     /// <summary>
     /// Gets the value of the specified field, if it exists. The name will be matched exactly if possible,
@@ -401,7 +401,7 @@ public class Record : IDataRecord
     public string GetStringOrDefault(string name, string fallback) => GetValueOrDefault(dataReader.GetString, name, fallback);
 
 
-    private T GetValueOrDefault<T>(Func<int, T> getterFunction, string name, T fallback = default(T))
+    private T GetValueOrDefault<T>(Func<int, T> getterFunction, string name, T fallback = default)
     {
         return HasField(name) && !IsDBNull(name) ? getterFunction(GetIndex(name)) : fallback;
     }

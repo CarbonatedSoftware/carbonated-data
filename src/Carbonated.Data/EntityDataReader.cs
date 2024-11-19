@@ -12,10 +12,10 @@ namespace Carbonated.Data;
 /// <typeparam name="TEntity">The type of the entity to read.</typeparam>
 public sealed class EntityDataReader<TEntity> : IDataRecord, IDataReader
 {
-    private readonly IList<TEntity> entities;
+    private readonly List<TEntity> entities;
     private readonly PropertyMapper<TEntity> propertyMapper;
-    private readonly IList<PropertyMapInfo> propertyMappings;
-    private readonly IDictionary<string, int> fieldMappings;
+    private readonly List<PropertyMapInfo> propertyMappings;
+    private readonly Dictionary<string, int> fieldMappings;
 
     private readonly int recordCount;
     private int recordIndex = -1;
