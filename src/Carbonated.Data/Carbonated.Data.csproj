@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <Authors>Carbonated Software</Authors>
     <Description>Simple data access library.</Description>
     <Copyright>© 2024 Carbonated Software</Copyright>
     <PackageProjectUrl>https://github.com/CarbonatedSoftware/carbonated-data</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +22,9 @@
       <_Parameter1>$(AssemblyName).Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <None Include="docs\README.md" Pack="True" PackagePath="\" />
+  </ItemGroup>
+
 </Project>

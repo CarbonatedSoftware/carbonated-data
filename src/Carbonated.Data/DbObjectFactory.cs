@@ -127,5 +127,5 @@ public abstract class DbObjectFactory
     /// Returns true if there are interstitial spaces in the SQL text, indicating that it
     /// is an ad-hoc query, rather than a stored procedure name.
     /// </summary>
-    private bool IsAdHoc(string sql) => sql.Trim().Contains(" ");
+    private static bool IsAdHoc(string sql) => sql.Trim().Contains(' ');
 }

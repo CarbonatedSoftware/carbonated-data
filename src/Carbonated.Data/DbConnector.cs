@@ -93,6 +93,7 @@ public class DbConnector : DbContext
             contextConnection?.Close();
             contextConnection = null;
             dbFactory = null; // Null the factory so that using a disposed context will throw.
+            GC.SuppressFinalize(this);
         }
     }
 
@@ -171,7 +172,7 @@ public class DbConnector : DbContext
     /// <param name="parameters">Parameters for the script, if any.</param>
     /// <returns>A typed reader.</returns>
     public EntityReader<TEntity> QueryReader<TEntity>(string sql, IEnumerable<DbParameter> parameters = null) 
-        => new EntityReader<TEntity>(QueryReader(sql, parameters), Mappers.Get<TEntity>());
+        => new(QueryReader(sql, parameters), Mappers.Get<TEntity>());
 
     /// <summary>
     /// Executes a SQL query and returns the results in a DbDataReader.

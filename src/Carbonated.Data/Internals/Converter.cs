@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 
 namespace Carbonated.Data.Internals;
 
@@ -149,8 +150,8 @@ internal class Converter
         }
         string str = value.ToString().Trim();
         return string.IsNullOrWhiteSpace(str)
-            || (str.StartsWith("{") && str.EndsWith("}"))
-            || (str.StartsWith("[") && str.EndsWith("]"));
+            || (str.StartsWith('{') && str.EndsWith('}'))
+            || (str.StartsWith('[') && str.EndsWith(']'));
     }
 
     private static object DeserializeJson(object value, Type propertyType)

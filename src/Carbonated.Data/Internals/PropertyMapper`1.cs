@@ -347,11 +347,8 @@ public class PropertyMapper<TEntity> : Mapper<TEntity>
     private PropertyMapper<TEntity> SetCondition<P>(Expression<Func<TEntity, P>> property, PopulationCondition condition)
     {
         var prop = (PropertyInfo)((MemberExpression)property.Body).Member;
-        var existing = mappings.SingleOrDefault(m => m.Property.Name == prop.Name);
-        if (existing == null)
-        {
-            throw new Exception($"No mapping was found for property {prop.Name}");
-        }
+        var existing = mappings.SingleOrDefault(m => m.Property.Name == prop.Name)
+            ?? throw new Exception($"No mapping was found for property {prop.Name}");
         existing.Condition = condition;
         existing.IsIgnored = false;
 
