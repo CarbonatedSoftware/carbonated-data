@@ -21,9 +21,19 @@ public interface DbContext : IDisposable
     DbConnection Connection { get; }
 
     /// <summary>
+    /// The transaction in use by the context, if there is one.
+    /// </summary>
+    DbTransaction Transaction { get; }
+
+    /// <summary>
     /// The engine-specific object factory to create Db objects.
     /// </summary>
     DbObjectFactory ObjectFactory { get; }
+
+    /// <summary>
+    /// Rolls back the active transaction, if there is one.
+    /// </summary>
+    void Rollback();
 
     /// <summary>
     /// Executes SQL without returning a result.

@@ -16,16 +16,16 @@ internal class SaveAdapterMaker
         this.commandTimeout = commandTimeout;
     }
 
-    internal DbDataAdapter MakeAdapter(DataTable table, DbConnection connection)
+    internal DbDataAdapter MakeAdapter(DataTable table, DbConnection connection, DbTransaction transaction)
     {
         var adapter = dbFactory.CreateDataAdapter();
-        adapter.InsertCommand = MakeInsertCommand(table, connection);
-        adapter.UpdateCommand = MakeUpdateCommand(table, connection);
-        adapter.DeleteCommand = MakeDeleteCommand(table, connection);
+        adapter.InsertCommand = MakeInsertCommand(table, connection, transaction);
+        adapter.UpdateCommand = MakeUpdateCommand(table, connection, transaction);
+        adapter.DeleteCommand = MakeDeleteCommand(table, connection, transaction);
         return adapter;
     }
 
-    private DbCommand MakeInsertCommand(DataTable table, DbConnection connection)
+    private DbCommand MakeInsertCommand(DataTable table, DbConnection connection, DbTransaction transaction)
     {
         var parameters = new List<DbParameter>();
         var insertColumns = new List<string>();
@@ -42,10 +42,10 @@ internal class SaveAdapterMaker
         }
 
         string sql = $"insert into {table.TableName} ({string.Join(", ", insertColumns)}) values ({string.Join(", ", insertValues)})";
-        return PrepareCommand(sql, parameters, connection);
+        return PrepareCommand(sql, parameters, connection, transaction);
     }
 
-    private DbCommand MakeUpdateCommand(DataTable table, DbConnection connection)
+    private DbCommand MakeUpdateCommand(DataTable table, DbConnection connection, DbTransaction transaction)
     {
         var parameters = new List<DbParameter>();
         var setColumns = new List<string>();
@@ -65,10 +65,10 @@ internal class SaveAdapterMaker
         }
 
         string sql = $"update {table.TableName} set {string.Join(", ", setColumns)} where {string.Join(" and ", keyColumns)}";
-        return PrepareCommand(sql, parameters, connection);
+        return PrepareCommand(sql, parameters, connection, transaction);
     }
 
-    private DbCommand MakeDeleteCommand(DataTable table, DbConnection connection)
+    private DbCommand MakeDeleteCommand(DataTable table, DbConnection connection, DbTransaction transaction)
     {
         var parameters = new List<DbParameter>();
         var keyColumns = new List<string>();
@@ -80,7 +80,7 @@ internal class SaveAdapterMaker
         }
 
         string sql = $"delete from {table.TableName} where {string.Join(" and ", keyColumns)}";
-        return PrepareCommand(sql, parameters, connection);
+        return PrepareCommand(sql, parameters, connection, transaction);
     }
 
     private DbParameter CreateMappingParameter(string paramName, string columnName)
@@ -91,9 +91,13 @@ internal class SaveAdapterMaker
         return p;
     }
 
-    private DbCommand PrepareCommand(string sql, IEnumerable<DbParameter> parameters, DbConnection connection)
+    private DbCommand PrepareCommand(string sql, IEnumerable<DbParameter> parameters, DbConnection connection, DbTransaction transaction)
     {
         var cmd = dbFactory.CreateCommand(sql, connection, commandTimeout);
+        if (transaction != null)
+        {
+            cmd.Transaction = transaction;
+        }
         cmd.Prepare();
         if (parameters?.Count() > 0)
         {

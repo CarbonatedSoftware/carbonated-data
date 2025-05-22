@@ -40,12 +40,21 @@ public class MockDataRecord : IDataRecord
     public long GetInt64(int i) => (long)fields[i].Value;
     public string GetString(int i) => fields[i].Value.ToString();
 
+    public int GetValues(object[] values)
+    {
+        int valueLength = Math.Min(values.Length, fields.Count);
+        for (int i = 0; i < valueLength; i++)
+        {
+            values[i] = fields[i].Value;
+        }
+        return valueLength;
+    }
+
     #region IDataRecord members that we don't need for testing
     public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length) => throw new NotImplementedException();
     public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length) => throw new NotImplementedException();
     public IDataReader GetData(int i) => throw new NotImplementedException();
     public string GetDataTypeName(int i) => throw new NotImplementedException();
     public Type GetFieldType(int i) => throw new NotImplementedException();
-    public int GetValues(object[] values) => throw new NotImplementedException();
     #endregion
 }

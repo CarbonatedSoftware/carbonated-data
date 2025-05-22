@@ -9,7 +9,7 @@ namespace Carbonated.Data.SqlServer.Tests;
 [TestFixture]
 public class ConnectorTests
 {
-    private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
+    private const string TestConnectionString = @"Server=tcp:carbonated.database.windows.net,1433;Initial Catalog=IntegrationTests;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=""Active Directory Default"";";
     private DbConnector connector;
 
     [SetUp]
@@ -177,5 +177,40 @@ public class ConnectorTests
         // Verify that we're back to our starting point
         count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
         Assert.That(count, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void MakeUpdateWithTransaction()
+    {
+        using (var context = connector.OpenContext(true))
+        {
+            context.NonQuery("update cities set Name = 'Philly' where id = 5");
+        }
+
+        var updated = connector.Query<City>("select * from cities where id = 5").Single();
+        Assert.That(updated.Name, Is.EqualTo("Philly"));
+
+        // Clean-up
+        connector.NonQuery("update cities set Name = 'Philadelphia' where id = 5");
+    }
+
+    [Test]
+    public void RollbackTransactionAfterChanges()
+    {
+        var original = connector.Query<City>("select * from cities where id = 5").Single();
+
+        Assert.That(original.Name, Is.EqualTo("Philadelphia"));
+
+        var context = connector.OpenContext(true);
+        context.NonQuery("update cities set Name = 'Philly' where id = 5");
+        var updated = context.Query<City>("select * from cities where id = 5").Single();
+
+        Assert.That(updated.Name, Is.EqualTo("Philly"));
+
+        context.Rollback();
+
+        var rolledback = connector.Query<City>("select * from cities where id = 5").Single();
+
+        Assert.That(rolledback.Name, Is.EqualTo("Philadelphia"));
     }
 }

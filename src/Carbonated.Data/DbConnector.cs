@@ -16,6 +16,7 @@ public class DbConnector : DbContext
     private readonly bool isContext;
     private DbObjectFactory dbFactory;
     private DbConnection contextConnection;
+    private DbTransaction contextTranscation;
 
     /// <summary>
     /// Constructs a DbConnector.
@@ -42,12 +43,14 @@ public class DbConnector : DbContext
     /// <summary>
     /// Internal constructor used by the OpenContext call.
     /// </summary>
-    internal DbConnector(DbObjectFactory objectFactory, DbConnection connection, DbConnectorOptions options)
+    internal DbConnector(DbObjectFactory objectFactory, DbConnection connection, DbConnectorOptions options, MapperCollection mappers, DbTransaction transaction = null)
     {
         dbFactory = objectFactory;
         contextConnection = connection;
+        contextTranscation = transaction;
         this.options = options;
         isContext = true;
+        Mappers = mappers;
     }
 
     /// <summary>
@@ -68,7 +71,11 @@ public class DbConnector : DbContext
 
     #region DbContext
 
+    private bool transactionClosed = false;
+
     DbConnection DbContext.Connection => contextConnection;
+
+    DbTransaction DbContext.Transaction => contextTranscation;
 
     /// <summary>
     /// Opens a connection and returns a data context that will operate against that
@@ -76,10 +83,20 @@ public class DbConnector : DbContext
     /// string and timeout settings from the parent connector.
     /// </summary>
     /// <returns>A disposable data context with an open connection.</returns>
-    public DbContext OpenContext()
+    public DbContext OpenContext(bool withTransaction = false)
     {
         var cn = dbFactory.OpenConnection(options.ConnectionString);
-        return new DbConnector(dbFactory, cn, options);
+        var tx = (withTransaction) ? cn.BeginTransaction() : null;
+        return new DbConnector(dbFactory, cn, options, Mappers, tx);
+    }
+
+    void DbContext.Rollback()
+    {
+        if (contextTranscation != null && !transactionClosed)
+        {
+            contextTranscation.Rollback();
+            transactionClosed = true;
+        }
     }
 
     /// <summary>
@@ -90,6 +107,14 @@ public class DbConnector : DbContext
     {
         if (isContext)
         {
+            if (contextTranscation != null && !transactionClosed)
+            {
+                contextTranscation.Commit();
+                transactionClosed = true;
+            }
+            contextTranscation?.Dispose();
+            contextTranscation = null;
+
             contextConnection?.Close();
             contextConnection = null;
             dbFactory = null; // Null the factory so that using a disposed context will throw.
@@ -312,7 +337,7 @@ public class DbConnector : DbContext
         try
         {
             var sam = new SaveAdapterMaker(dbFactory, options.CommandTimeout);
-            using var adapter = sam.MakeAdapter(table, cn);
+            using var adapter = sam.MakeAdapter(table, cn, contextTranscation);
             return adapter.Update(table);
         }
         finally
@@ -348,6 +373,10 @@ public class DbConnector : DbContext
     private DbCommand MakeCommand(string sql, DbConnection connection, IEnumerable<DbParameter> parameters)
     {
         var cmd = dbFactory.CreateCommand(sql, connection, options.CommandTimeout);
+        if (isContext && contextTranscation != null)
+        {
+            cmd.Transaction = contextTranscation;
+        }
         if (parameters?.Count() > 0)
         {
             cmd.Parameters.AddRange(parameters.ToArray());
