@@ -96,6 +96,11 @@ public class Record : IDataRecord
     public object this[int i] => dataReader[i];
 
     /// <summary>
+    /// Gets the number of columns in the current row of the data record.
+    /// </summary>
+    public int FieldCount => dataReader.FieldCount;
+
+    /// <summary>
     /// Return whether the specified field is set to null.
     /// </summary>
     /// <param name="name">The name of the field to find.</param>

@@ -7,13 +7,12 @@ namespace Carbonated.Data.SqlServer.Tests;
 [TestFixture]
 public class QueryScalarTests
 {
-    private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
     private DbConnector db;
 
     [SetUp]
     public void SetUp()
     {
-        db = new SqlServerDbConnector(TestConnectionString);
+        db = new SqlServerDbConnector(IntegrationTestContext.TestConnectionString);
     }
 
     [TearDown]

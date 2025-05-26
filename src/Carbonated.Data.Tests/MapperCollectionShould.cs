@@ -67,6 +67,20 @@ public class MapperCollectionShould
     }
 
     [Test]
+    public void AddTupleMapperIfTypeIsTuple()
+    {
+        Assert.That(mc.HasMapper<(int, string)>(), Is.False);
+
+        var mapper = mc.Get<(int, string)>();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(mc.HasMapper<(int, string)>(), Is.True);
+            Assert.That(mapper, Is.InstanceOf<TupleMapper<(int, string)>>());
+        });
+    }
+
+    [Test]
     public void AutoGenerateAndAddPropertyMapperDuringGetIfNotYetRegistered()
     {
         Assert.That(mc.HasMapper<Entity>(), Is.False);

@@ -8,13 +8,12 @@ namespace Carbonated.Data.SqlServer.Tests;
 [TestFixture]
 public class QueryTests
 {
-    private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
     private DbConnector connector;
 
     [SetUp]
     public void SetUp()
     {
-        connector = new SqlServerDbConnector(TestConnectionString);
+        connector = new SqlServerDbConnector(IntegrationTestContext.TestConnectionString);
     }
 
     [TearDown]
@@ -196,7 +195,7 @@ public class QueryTests
         {
             null,
             null,
-            new byte[] { 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 }
+            [0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10]
         };
         Assert.That(values, Is.EqualTo(expected).AsCollection);
     }
@@ -251,7 +250,7 @@ public class QueryTests
             Assert.That(empties.GuidAsUniqueId, Is.EqualTo(Guid.Empty));
             Assert.That(empties.Char, Is.EqualTo('\0'));
             Assert.That(empties.String, Is.EqualTo(string.Empty));
-            Assert.That(empties.ByteArray, Is.EqualTo(null).AsCollection);
+            Assert.That(empties.ByteArray, Is.EqualTo((byte[])null).AsCollection);
             Assert.That(empties.IntEnum, Is.EqualTo(Numbers.Zero));
             Assert.That(empties.StringEnum, Is.EqualTo(Colors.Red));
         });

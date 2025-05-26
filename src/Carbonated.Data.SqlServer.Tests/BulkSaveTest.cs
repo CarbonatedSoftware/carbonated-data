@@ -11,13 +11,12 @@ namespace Carbonated.Data.SqlServer.Tests;
 /// </summary>
 internal class BulkSaveTest
 {
-    private const string TestConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=CarbonatedTest;Integrated Security=True;Trust Server Certificate=True";
     private DbConnector connector;
 
     [SetUp]
     public void SetUp()
     {
-        connector = new SqlServerDbConnector(TestConnectionString);
+        connector = new SqlServerDbConnector(IntegrationTestContext.TestConnectionString);
     }
 
     [TearDown]

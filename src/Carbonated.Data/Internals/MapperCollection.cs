@@ -111,8 +111,11 @@ public class MapperCollection
     /// <returns>The entity type's mapper.</returns>
     public Mapper<TEntity> Get<TEntity>()
     {
-        var mapper = mappers.GetOrAdd(typeof(TEntity), _ => new PropertyMapper<TEntity>(valueConverters));
-        return (Mapper<TEntity>)mapper;
+        if (TupleMapper<TEntity>.IsTupleType(typeof(TEntity)))
+        {
+            return (Mapper<TEntity>)mappers.GetOrAdd(typeof(TEntity), _ => new TupleMapper<TEntity>(valueConverters));
+        }
+        return (Mapper<TEntity>)mappers.GetOrAdd(typeof(TEntity), _ => new PropertyMapper<TEntity>(valueConverters));
     }
 
     /// <summary>

@@ -9,13 +9,13 @@ namespace Carbonated.Data.SqlServer.Tests;
 [TestFixture]
 public class ConnectorTests
 {
-    private const string TestConnectionString = @"Server=tcp:carbonated.database.windows.net,1433;Initial Catalog=IntegrationTests;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=""Active Directory Default"";";
     private DbConnector connector;
 
     [SetUp]
     public void SetUp()
     {
-        connector = new SqlServerDbConnector(TestConnectionString);
+
+        connector = new SqlServerDbConnector(IntegrationTestContext.TestConnectionString);
     }
 
     [TearDown]
@@ -117,7 +117,7 @@ public class ConnectorTests
         EntityReader<City> reader;
         using (reader = connector.QueryReader<City>("select * from cities order by id"))
         {
-            cities = reader.TakeWhile(city => city.Population > 2_000_000).ToList();
+            cities = [.. reader.TakeWhile(city => city.Population > 2_000_000)];
         }
 
         Assert.Multiple(() =>

@@ -42,7 +42,7 @@ public class SqlServerObjectFactory : DbObjectFactory
     /// <returns>The identifier in delimited form.</returns>
     public override string DelimitIdentifier(string identifier)
     {
-        if (identifier.StartsWith("[") && identifier.EndsWith("]"))
+        if (identifier.StartsWith('[') && identifier.EndsWith(']'))
             return identifier;
         return $"[{identifier}]";
     }
