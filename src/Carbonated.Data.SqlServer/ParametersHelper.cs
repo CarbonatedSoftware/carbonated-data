@@ -6,6 +6,7 @@ namespace Carbonated.Data.SqlServer;
 
 /// <summary>
 /// Provides helper methods for creating strongly-typed SQL Server parameters.
+/// Meant for use with Tuple parameters and DbParameter lists.
 /// </summary>
 public static class ParametersHelper
 {

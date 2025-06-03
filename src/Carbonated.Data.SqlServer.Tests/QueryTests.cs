@@ -187,6 +187,14 @@ public class QueryTests
     }
 
     [Test]
+    public void QueryStringFixed()
+    {
+        var values = connector.Query<string>("select [string_fixed] from type_test order by id");
+
+        Assert.That(values, Is.EqualTo(new string[] { null, "     ", "fixed" }).AsCollection);
+    }
+
+    [Test]
     public void QueryByteArray()
     {
         var values = connector.Query<byte[]>("select [byte_array] from type_test order by id");
@@ -212,13 +220,13 @@ public class QueryTests
         Assert.Multiple(() =>
         {
             Assert.That(nulls.Bool, Is.False);
-            Assert.That(nulls.Byte, Is.EqualTo(0));
-            Assert.That(nulls.Short, Is.EqualTo(0));
-            Assert.That(nulls.Int, Is.EqualTo(0));
-            Assert.That(nulls.Long, Is.EqualTo(0));
-            Assert.That(nulls.Float, Is.EqualTo(0));
-            Assert.That(nulls.Double, Is.EqualTo(0));
-            Assert.That(nulls.Decimal, Is.EqualTo(0));
+            Assert.That(nulls.Byte, Is.Zero);
+            Assert.That(nulls.Short, Is.Zero);
+            Assert.That(nulls.Int, Is.Zero);
+            Assert.That(nulls.Long, Is.Zero);
+            Assert.That(nulls.Float, Is.Zero);
+            Assert.That(nulls.Double, Is.Zero);
+            Assert.That(nulls.Decimal, Is.Zero);
             Assert.That(nulls.DateTime, Is.EqualTo(DateTime.MinValue));
             Assert.That(nulls.DateTime2, Is.EqualTo(DateTime.MinValue));
             Assert.That(nulls.Date, Is.EqualTo(DateOnly.MinValue));
@@ -227,6 +235,7 @@ public class QueryTests
             Assert.That(nulls.GuidAsUniqueId, Is.EqualTo(Guid.Empty));
             Assert.That(nulls.Char, Is.EqualTo('\0'));
             Assert.That(nulls.String, Is.Null);
+            Assert.That(nulls.StringFixed, Is.Null);
             Assert.That(nulls.ByteArray, Is.Null);
             Assert.That(nulls.IntEnum, Is.EqualTo(Numbers.Zero));
             Assert.That(nulls.StringEnum, Is.EqualTo(Colors.Red));
@@ -235,13 +244,13 @@ public class QueryTests
         Assert.Multiple(() =>
         {
             Assert.That(empties.Bool, Is.False);
-            Assert.That(empties.Byte, Is.EqualTo(0));
-            Assert.That(empties.Short, Is.EqualTo(0));
-            Assert.That(empties.Int, Is.EqualTo(0));
-            Assert.That(empties.Long, Is.EqualTo(0));
-            Assert.That(empties.Float, Is.EqualTo(0));
-            Assert.That(empties.Double, Is.EqualTo(0));
-            Assert.That(empties.Decimal, Is.EqualTo(0));
+            Assert.That(empties.Byte, Is.Zero);
+            Assert.That(empties.Short, Is.Zero);
+            Assert.That(empties.Int, Is.Zero);
+            Assert.That(empties.Long, Is.Zero);
+            Assert.That(empties.Float, Is.Zero);
+            Assert.That(empties.Double, Is.Zero);
+            Assert.That(empties.Decimal, Is.Zero);
             Assert.That(empties.DateTime, Is.EqualTo(new DateTime(1753, 1, 1, 0, 0, 0)));
             Assert.That(empties.DateTime2, Is.EqualTo(DateTime.MinValue));
             Assert.That(empties.Date, Is.EqualTo(DateOnly.MinValue));
@@ -250,7 +259,8 @@ public class QueryTests
             Assert.That(empties.GuidAsUniqueId, Is.EqualTo(Guid.Empty));
             Assert.That(empties.Char, Is.EqualTo('\0'));
             Assert.That(empties.String, Is.EqualTo(string.Empty));
-            Assert.That(empties.ByteArray, Is.EqualTo((byte[])null).AsCollection);
+            Assert.That(empties.StringFixed, Is.EqualTo("     "));
+            Assert.That(empties.ByteArray, Is.Null);
             Assert.That(empties.IntEnum, Is.EqualTo(Numbers.Zero));
             Assert.That(empties.StringEnum, Is.EqualTo(Colors.Red));
         });
@@ -273,6 +283,7 @@ public class QueryTests
             Assert.That(values.GuidAsUniqueId, Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
             Assert.That(values.Char, Is.EqualTo('c'));
             Assert.That(values.String, Is.EqualTo("str"));
+            Assert.That(values.StringFixed, Is.EqualTo("fixed"));
             Assert.That(values.ByteArray, Is.EqualTo(new byte[] { 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 }).AsCollection);
             Assert.That(values.IntEnum, Is.EqualTo(Numbers.Three));
             Assert.That(values.StringEnum, Is.EqualTo(Colors.Green));
@@ -469,13 +480,13 @@ public class QueryTests
         Assert.Multiple(() =>
         {
             Assert.That(empties.Bool, Is.False);
-            Assert.That(empties.Byte, Is.EqualTo(0));
-            Assert.That(empties.Short, Is.EqualTo(0));
-            Assert.That(empties.Int, Is.EqualTo(0));
-            Assert.That(empties.Long, Is.EqualTo(0));
-            Assert.That(empties.Float, Is.EqualTo(0));
-            Assert.That(empties.Double, Is.EqualTo(0));
-            Assert.That(empties.Decimal, Is.EqualTo(0));
+            Assert.That(empties.Byte, Is.Zero);
+            Assert.That(empties.Short, Is.Zero);
+            Assert.That(empties.Int, Is.Zero);
+            Assert.That(empties.Long, Is.Zero);
+            Assert.That(empties.Float, Is.Zero);
+            Assert.That(empties.Double, Is.Zero);
+            Assert.That(empties.Decimal, Is.Zero);
             Assert.That(empties.DateTime, Is.EqualTo(new DateTime(1753, 1, 1, 0, 0, 0)));
             Assert.That(empties.DateTime2, Is.EqualTo(DateTime.MinValue));
             Assert.That(empties.Date, Is.EqualTo(DateOnly.MinValue));

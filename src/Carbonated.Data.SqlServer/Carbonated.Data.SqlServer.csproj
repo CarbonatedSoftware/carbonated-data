@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.4.0</Version>
+    <Version>2.5.0</Version>
     <Authors>Carbonated Software</Authors>
     <Description>SqlServer implementation of Carbonated Data.</Description>
     <Copyright>© 2025 Carbonated Software</Copyright>

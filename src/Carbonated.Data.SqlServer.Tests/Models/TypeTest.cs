@@ -20,6 +20,7 @@ internal class TypeTest
     public Guid GuidAsUniqueId { get; set; }
     public char Char { get; set; }
     public string String { get; set; }
+    public string StringFixed { get; set; }
     public byte[] ByteArray { get; set; }
     public Numbers IntEnum { get; set; }
     public Colors StringEnum { get; set; }

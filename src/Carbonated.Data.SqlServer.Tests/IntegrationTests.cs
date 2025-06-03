@@ -14,7 +14,6 @@ public class ConnectorTests
     [SetUp]
     public void SetUp()
     {
-
         connector = new SqlServerDbConnector(IntegrationTestContext.TestConnectionString);
     }
 
@@ -45,6 +44,30 @@ public class ConnectorTests
         {
             Assert.That(city.Id, Is.EqualTo(6));
             Assert.That(city.Name, Is.EqualTo("Phoenix"));
+        });
+    }
+
+    [Test]
+    public void ParameterizedAdHocQuery_WithObjectParams()
+    {
+        var city = connector.Query<City>("select * from cities where id = @id", new { id = 6 }).SingleOrDefault();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(city.Id, Is.EqualTo(6));
+            Assert.That(city.Name, Is.EqualTo("Phoenix"));
+        });
+    }
+
+    [Test]
+    public void ParameterizedAdHocQuery_WithNullObjectParams()
+    {
+        string name = null;
+        var city = connector.Query<City>("select * from cities where name = @name", new { name = name.AsNVarCharParam(20) }).SingleOrDefault();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(city, Is.Null);
         });
     }
 
@@ -150,7 +173,7 @@ public class ConnectorTests
     {
         // Check initial state
         int count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-        Assert.That(count, Is.EqualTo(0));
+        Assert.That(count, Is.Zero);
 
         // Load the table and add a row
         var cities = connector.QueryTable("select * from cities");
@@ -176,7 +199,7 @@ public class ConnectorTests
 
         // Verify that we're back to our starting point
         count = connector.QueryScalar<int>("select count(*) from cities where state = 'FL'");
-        Assert.That(count, Is.EqualTo(0));
+        Assert.That(count, Is.Zero);
     }
 
     [Test]

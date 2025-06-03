@@ -22,7 +22,7 @@ public class QueryScalarTests
     }
 
 
-    private string Select(string field, int id) => $"select [{field}] from type_test where id = {id}";
+    private static string Select(string field, int id) => $"select [{field}] from type_test where id = {id}";
 
     [Test]
     public void QueryScalarBool()
@@ -40,8 +40,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<byte>(Select("byte", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<byte>(Select("byte", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<byte>(Select("byte", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<byte>(Select("byte", 2)), Is.Zero);
             Assert.That(db.QueryScalar<byte>(Select("byte", 3)), Is.EqualTo(1));
         });
     }
@@ -51,8 +51,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<short>(Select("short", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<short>(Select("short", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<short>(Select("short", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<short>(Select("short", 2)), Is.Zero);
             Assert.That(db.QueryScalar<short>(Select("short", 3)), Is.EqualTo(2));
         });
     }
@@ -62,8 +62,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<int>(Select("int", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<int>(Select("int", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<int>(Select("int", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<int>(Select("int", 2)), Is.Zero);
             Assert.That(db.QueryScalar<int>(Select("int", 3)), Is.EqualTo(3));
         });
     }
@@ -73,8 +73,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<long>(Select("long", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<long>(Select("long", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<long>(Select("long", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<long>(Select("long", 2)), Is.Zero);
             Assert.That(db.QueryScalar<long>(Select("long", 3)), Is.EqualTo(5));
         });
     }
@@ -84,8 +84,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<float>(Select("float", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<float>(Select("float", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<float>(Select("float", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<float>(Select("float", 2)), Is.Zero);
             Assert.That(db.QueryScalar<float>(Select("float", 3)), Is.EqualTo(8.13f));
         });
     }
@@ -95,8 +95,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<double>(Select("double", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<double>(Select("double", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<double>(Select("double", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<double>(Select("double", 2)), Is.Zero);
             Assert.That(db.QueryScalar<double>(Select("double", 3)), Is.EqualTo(21.34));
         });
     }
@@ -106,8 +106,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<decimal>(Select("decimal", 1)), Is.EqualTo(0));
-            Assert.That(db.QueryScalar<decimal>(Select("decimal", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<decimal>(Select("decimal", 1)), Is.Zero);
+            Assert.That(db.QueryScalar<decimal>(Select("decimal", 2)), Is.Zero);
             Assert.That(db.QueryScalar<decimal>(Select("decimal", 3)), Is.EqualTo(55.89m));
         });
     }
@@ -194,9 +194,20 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<string>(Select("string", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<string>(Select("string", 1)), Is.Null);
             Assert.That(db.QueryScalar<string>(Select("string", 2)), Is.EqualTo(""));
             Assert.That(db.QueryScalar<string>(Select("string", 3)), Is.EqualTo("str"));
+        });
+    }
+
+    [Test]
+    public void QueryScalarStringFixed()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(db.QueryScalar<string>(Select("string_fixed", 1)), Is.Null);
+            Assert.That(db.QueryScalar<string>(Select("string_fixed", 2)), Is.EqualTo("     "));
+            Assert.That(db.QueryScalar<string>(Select("string_fixed", 3)), Is.EqualTo("fixed"));
         });
     }
 
@@ -205,8 +216,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 1)), Is.Null);
+            Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 2)), Is.Null);
             Assert.That(db.QueryScalar<byte[]>(Select("byte_array", 3)), Is.EqualTo(new byte[] { 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 }));
         });
     }
@@ -249,8 +260,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<byte?>(Select("byte", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<byte?>(Select("byte", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<byte?>(Select("byte", 1)), Is.Null);
+            Assert.That(db.QueryScalar<byte?>(Select("byte", 2)), Is.Zero);
             Assert.That(db.QueryScalar<byte?>(Select("byte", 3)), Is.EqualTo(1));
         });
     }
@@ -260,8 +271,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<short?>(Select("short", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<short?>(Select("short", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<short?>(Select("short", 1)), Is.Null);
+            Assert.That(db.QueryScalar<short?>(Select("short", 2)), Is.Zero);
             Assert.That(db.QueryScalar<short?>(Select("short", 3)), Is.EqualTo(2));
         });
     }
@@ -271,8 +282,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<int?>(Select("int", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<int?>(Select("int", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<int?>(Select("int", 1)), Is.Null);
+            Assert.That(db.QueryScalar<int?>(Select("int", 2)), Is.Zero);
             Assert.That(db.QueryScalar<int?>(Select("int", 3)), Is.EqualTo(3));
         });
     }
@@ -282,8 +293,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<long?>(Select("long", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<long?>(Select("long", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<long?>(Select("long", 1)), Is.Null);
+            Assert.That(db.QueryScalar<long?>(Select("long", 2)), Is.Zero);
             Assert.That(db.QueryScalar<long?>(Select("long", 3)), Is.EqualTo(5));
         });
     }
@@ -293,8 +304,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<float?>(Select("float", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<float?>(Select("float", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<float?>(Select("float", 1)), Is.Null);
+            Assert.That(db.QueryScalar<float?>(Select("float", 2)), Is.Zero);
             Assert.That(db.QueryScalar<float?>(Select("float", 3)), Is.EqualTo(8.13f));
         });
     }
@@ -304,8 +315,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<double?>(Select("double", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<double?>(Select("double", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<double?>(Select("double", 1)), Is.Null);
+            Assert.That(db.QueryScalar<double?>(Select("double", 2)), Is.Zero);
             Assert.That(db.QueryScalar<double?>(Select("double", 3)), Is.EqualTo(21.34));
         });
     }
@@ -315,8 +326,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 2)), Is.EqualTo(0));
+            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 1)), Is.Null);
+            Assert.That(db.QueryScalar<decimal?>(Select("decimal", 2)), Is.Zero);
             Assert.That(db.QueryScalar<decimal?>(Select("decimal", 3)), Is.EqualTo(55.89m));
         });
     }
@@ -326,7 +337,7 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 1)), Is.Null);
             Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 2)), Is.EqualTo(new DateTime(1753, 1, 1, 0, 0, 0)));
             Assert.That(db.QueryScalar<DateTime?>(Select("DateTime", 3)), Is.EqualTo(new DateTime(2018, 4, 2, 13, 14, 15)));
         });
@@ -337,7 +348,7 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 1)), Is.Null);
             Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 2)), Is.EqualTo(DateTime.MinValue));
             Assert.That(db.QueryScalar<DateTime?>(Select("DateTime2", 3)), Is.EqualTo(new DateTime(2023, 8, 11, 14, 9, 15)));
         });
@@ -348,7 +359,7 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 1)), Is.Null);
             Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 2)), Is.EqualTo(DateOnly.MinValue));
             Assert.That(db.QueryScalar<DateOnly?>(Select("Date", 3)), Is.EqualTo(new DateOnly(2023, 8, 11)));
         });
@@ -359,7 +370,7 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 1)), Is.Null);
             Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 2)), Is.EqualTo(TimeOnly.MinValue));
             Assert.That(db.QueryScalar<TimeOnly?>(Select("Time", 3)), Is.EqualTo(new TimeOnly(14, 9, 15)));
         });
@@ -370,8 +381,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 1)), Is.Null);
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 2)), Is.Null);
             Assert.That(db.QueryScalar<Guid?>(Select("guid_as_string", 3)), Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
         });
     }
@@ -381,8 +392,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 1)), Is.Null);
+            Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 2)), Is.Null);
             Assert.That(db.QueryScalar<Guid?>(Select("guid_as_uniqueid", 3)), Is.EqualTo(new Guid("7ca43d156e8749dfbaffdb241d0d494c")));
         });
     }
@@ -392,8 +403,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<char?>(Select("char", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<char?>(Select("char", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<char?>(Select("char", 1)), Is.Null);
+            Assert.That(db.QueryScalar<char?>(Select("char", 2)), Is.Null);
             Assert.That(db.QueryScalar<char?>(Select("char", 3)), Is.EqualTo('c'));
         });
     }
@@ -403,7 +414,7 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 1)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 1)), Is.Null);
             Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 2)), Is.EqualTo(Numbers.Zero));
             Assert.That(db.QueryScalar<Numbers?>(Select("int_enum", 3)), Is.EqualTo(Numbers.Three));
         });
@@ -414,8 +425,8 @@ public class QueryScalarTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 1)), Is.EqualTo(null));
-            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 2)), Is.EqualTo(null));
+            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 1)), Is.Null);
+            Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 2)), Is.Null);
             Assert.That(db.QueryScalar<Colors?>(Select("string_enum", 3)), Is.EqualTo(Colors.Green));
         });
     }
@@ -430,9 +441,8 @@ public class QueryScalarTests
         Assert.That(result.Value, Is.EqualTo(3));
     }
 
-    class SemanticInt
+    class SemanticInt(int value)
     {
-        public SemanticInt(int value) { Value = value; }
-        public int Value { get; }
+        public int Value { get; } = value;
     }
 }
