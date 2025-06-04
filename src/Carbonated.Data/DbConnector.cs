@@ -126,8 +126,10 @@ public class DbConnector : DbContext
 
 
     /// <summary>
-    /// Executes SQL without returning a result.
+    /// Executes a non-query SQL command against the database using the specified SQL string and parameters.
     /// </summary>
+    /// <remarks>This method is used to execute SQL commands that do not return results, such as INSERT, UPDATE, or
+    /// DELETE statements.</remarks>
     /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
     /// <param name="parameters">Parameters for the script, if any.</param>
     /// <returns>The number of rows affected.</returns>
@@ -135,8 +137,10 @@ public class DbConnector : DbContext
         => NonQuery(sql, dbFactory.CreateParameters(parameters));
 
     /// <summary>
-    /// Executes SQL without returning a result.
+    /// Executes a non-query SQL command against the database using the specified SQL string and parameters.
     /// </summary>
+    /// <remarks>This method is used to execute SQL commands that do not return results, such as INSERT, UPDATE, or
+    /// DELETE statements.</remarks>
     /// <param name="sql">An ad hoc script or the name of a stored procedure to execute.</param>
     /// <param name="parameters">Parameters for the script, if any.</param>
     /// <returns>The number of rows affected.</returns>
