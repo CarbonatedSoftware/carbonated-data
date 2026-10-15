@@ -180,7 +180,7 @@ public class DbConnector : DbContext
     /// <param name="parameters">Parameters for the script, if any.</param>
     /// <returns>A list of entities.</returns>
     public IEnumerable<TEntity> Query<TEntity>(string sql, IEnumerable<DbParameter> parameters = null) 
-        => QueryReader<TEntity>(sql, parameters).AsEnumerable();
+        => QueryReader<TEntity>(sql, parameters).ToList();
 
 
     /// <summary>
